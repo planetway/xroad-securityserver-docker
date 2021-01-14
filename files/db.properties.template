@@ -1,0 +1,21 @@
+serverconf.hibernate.jdbc.use_streams_for_binary     = ${PX_SERVERCONF_JDBC_USE_STREAMS=true}
+serverconf.hibernate.dialect                         = ${PX_SERVERCONF_DIALECT=ee.ria.xroad.common.db.CustomPostgreSQLDialect}
+serverconf.hibernate.connection.driver_class         = ${PX_SERVERCONF_DRIVER=org.postgresql.Driver}
+serverconf.hibernate.connection.url                  = ${PX_SERVERCONF_URL=jdbc:postgresql://postgres:5432/serverconf}
+serverconf.hibernate.hikari.dataSource.currentSchema = serverconf,public
+serverconf.hibernate.connection.username             = ${PX_SERVERCONF_USERNAME=serverconf}
+serverconf.hibernate.connection.password             = ${PX_SERVERCONF_PASSWORD}
+
+op-monitor.hibernate.jdbc.use_streams_for_binary     = ${PX_OPMONITOR_JDBC_USE_STREAMS=true}
+op-monitor.hibernate.connection.driver_class         = ${PX_OPMONITOR_DRIVER=org.postgresql.Driver}
+op-monitor.hibernate.connection.url                  = ${PX_OPMONITOR_URL=jdbc:postgresql://postgres:5432/op-monitor}
+op-monitor.hibernate.hikari.dataSource.currentSchema = opmonitor,public
+op-monitor.hibernate.connection.username             = ${PX_OPMONITOR_USERNAME=opmonitor}
+op-monitor.hibernate.connection.password             = ${PX_OPMONITOR_PASSWORD}
+
+messagelog.hibernate.jdbc.use_streams_for_binary     = ${PX_MESSAGELOG_JDBC_USE_STREAMS=true}
+messagelog.hibernate.connection.driver_class         = ${PX_MESSAGELOG_DRIVER=org.postgresql.Driver}
+messagelog.hibernate.connection.url                  = ${PX_MESSAGELOG_URL=jdbc:postgresql://postgres:5432/messagelog}
+messagelog.hibernate.hikari.dataSource.currentSchema = messagelog,public
+messagelog.hibernate.connection.username             = ${PX_MESSAGELOG_USERNAME=messagelog}
+messagelog.hibernate.connection.password             = ${PX_MESSAGELOG_PASSWORD}

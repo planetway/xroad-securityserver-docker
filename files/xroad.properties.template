@@ -1,0 +1,11 @@
+postgres.connection.user           = ${POSTGRES_USER}
+postgres.connection.password       = ${POSTGRES_PASSWORD}
+
+serverconf.database.admin_user     = ${PX_SERVERCONF_ADMIN_USER=$POSTGRES_USER}
+serverconf.database.admin_password = ${PX_SERVERCONF_ADMIN_PASSWORD=$POSTGRES_PASSWORD}
+
+op-monitor.database.admin_user     = ${PX_OPMONITOR_ADMIN_USER=$POSTGRES_USER}
+op-monitor.database.admin_password = ${PX_OPMONITOR_ADMIN_PASSWORD=$POSTGRES_PASSWORD}
+
+messagelog.database.admin_user     = ${PX_MESSAGELOG_ADMIN_USER=$POSTGRES_USER}
+messagelog.database.admin_password = ${PX_MESSAGELOG_ADMIN_PASSWORD=$POSTGRES_PASSWORD}

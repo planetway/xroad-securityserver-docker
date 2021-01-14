@@ -1,0 +1,9 @@
+PROXY_PARAMS=" -Xms${PX_PROXY_XMS=100}m -Xmx${PX_PROXY_XMX=1536}m -XX:MaxMetaspaceSize=${PX_PROXY_METASPACE=128}m \
+-Djavax.net.ssl.sessionCacheSize=10000 \
+-Dlogback.configurationFile=/etc/xroad/conf.d/proxy-logback.xml \
+-Dxroad.proxy.clientHandlers=$${CLIENT_HANDLERS#?} \
+-Dxroad.proxy.serverServiceHandlers=$${SERVICE_HANDLERS#?} \
+-Dxroad.proxy.serverRestServiceHandlers=$${SERVICE_REST_HANDLERS#?}"
+
+# To be able to reverse proxy from nginx in another container
+JETTY_PARAMS=" -Djetty.host=0.0.0.0 $${JETTY_PARAMS}"

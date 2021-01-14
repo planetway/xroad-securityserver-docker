@@ -1,0 +1,59 @@
+version: '3.7'
+
+services:
+  ss01:
+    # build:
+    #   context: ../..
+    #   args:
+    #     PX_REPOSITORY_URL: https://deb.planetcross.net/planetx
+    #     PX_CANDIDATE: 6.24.1-1
+    image: planetway/xroad-securityserver:6.24.1-1
+    command: bash -c "/files/initdb.sh && /files/cmd.sh"
+    depends_on:
+      - postgres
+    environment:
+      # JP-TEST or JP
+      - PX_INSTANCE=JP-TEST
+      - PX_MEMBER_CLASS=COM
+      - PX_MEMBER_CODE=0170121212121
+      - PX_SS_CODE=ss01
+      - PX_TSA_NAME=TEST of Planetway Timestamping Authority 2020
+      - PX_TSA_URL=https://tsa.test.planetcross.net
+      - PX_TOKEN_PIN=jXq+rlg2VS
+      - PX_ADMINUI_USER=admin
+      - PX_ADMINUI_PASSWORD=Secret222
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - PX_SERVERCONF_PASSWORD=serverconf
+      - PX_MESSAGELOG_PASSWORD=messagelog
+      - PX_OPMONITOR_PASSWORD=opmonitor
+      - PX_POPULATE_DATABASE=true
+      - PX_ENROLL=true
+      - AWS_ACCESS_KEY_ID=
+      - AWS_SECRET_ACCESS_KEY=
+      # edit the bucket
+      - PX_INI_MESSAGELOG_ARCHIVE_TRANSFER_COMMAND=aws s3 sync --sse --exclude \"*\" --include \"*.zip\" /var/lib/xroad s3://bucket/lib/xroad && find /var/lib/xroad -name \"*.zip\" -mtime +2 -delete
+    ports:
+      - "2080:2080"
+      - "4000:4000"
+      - "5500:5500"
+      - "5577:5577"
+      - "5588:5588"
+      - "8000:80"
+      - "8443:443"
+    volumes:
+      # .p12 files and keyconf.xml
+      - "./../volumes/signer:/etc/xroad/signer"
+      # mlog.zip files are stored here, and ./backup contains backups
+      - "./../volumes/xroad:/var/lib/xroad"
+
+  postgres:
+    image: postgres:10
+    environment:
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - "./../volumes/postgres:/var/lib/postgresql/data"

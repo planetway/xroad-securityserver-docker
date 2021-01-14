@@ -1,0 +1,5 @@
+examples/volumes/
+tmp/
+
+# docker save
+*.gz
