@@ -45,9 +45,9 @@ services:
       - "8443:443"
     volumes:
       # .p12 files and keyconf.xml
-      - "./../volumes/signer:/etc/xroad/signer"
+      - "px-ss-signer:/etc/xroad/signer"
       # mlog.zip files are stored here, and ./backup contains backups
-      - "./../volumes/xroad:/var/lib/xroad"
+      - "px-ss-xroad:/var/lib/xroad"
 
   postgres:
     image: postgres:10
@@ -56,4 +56,9 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - "./../volumes/postgres:/var/lib/postgresql/data"
+      - "px-ss-postgres:/var/lib/postgresql/data"
+
+volumes:
+  px-ss-postgres:
+  px-ss-signer:
+  px-ss-xroad:

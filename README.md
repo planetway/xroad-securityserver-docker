@@ -45,16 +45,23 @@ services:
       - "8443:443"
     volumes:
       # .p12 files and keyconf.xml
-      - "px-ss-etc-signer:/etc/xroad/signer"
+      - "px-ss-signer:/etc/xroad/signer"
       # mlog.zip files are stored here, and ./backup contains backups
-      - "/mnt/xroad:/var/lib/xroad"
+      - "px-ss-xroad:/var/lib/xroad"
 
   postgres:
     image: postgres:10
     environment:
       POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
     volumes:
-      - "px-ss-postgres-data:/var/lib/postgresql/data"
+      - "px-ss-postgres:/var/lib/postgresql/data"
+
+volumes:
+  px-ss-postgres:
+  px-ss-signer:
+  px-ss-xroad:
 ```
 
 To start the Security server, run following command.
