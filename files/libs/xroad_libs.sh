@@ -8,6 +8,39 @@
 #
 # functions
 
+function create_api_key () {
+  local user=$1
+  local password=$2
+
+  created_api_key=($(curl -s -k -X POST -u $user:$password \
+    --data \
+    '["XROAD_SECURITY_OFFICER",
+    "XROAD_REGISTRATION_OFFICER",
+    "XROAD_SERVICE_ADMINISTRATOR",
+    "XROAD_SYSTEM_ADMINISTRATOR",
+    "XROAD_SECURITYSERVER_OBSERVER"]' \
+    --header "Content-Type: application/json" \
+    "https://localhost:4000/api/v1/api-keys" | jq -r -c '.id,.key'))
+
+  if [[ -z $created_api_key ]] ; then
+    log "Warning, API key request failed, exiting"
+    exit 1
+  else
+    log "API key request successful"
+  fi
+}
+
+function destroy_api_key () {
+  local user=$1
+  local password=$2
+  local api_key_id=${created_api_key[0]}
+
+  log "Destroying API key ${api_key}"
+
+  curl -s -k -X DELETE -u ${user}:${password} \
+    "https://localhost:4000/api/v1/api-keys/${api_key_id}"
+}
+
 function generate_csr () {
   local type=$1
   local id=$(readlink $type|cut -d . -f "1")
@@ -70,42 +103,46 @@ function import_sign_certificate () {
   fi
 }
 
+# subfunction to initialize token with expect
+# short password will cause Signer.TokenPinPolicyFailure
+# we're expecting {"event":"Initialize the software token",...}
+function expect_initialize_software_token() {
+  local pin=$1
+  export -f signer_console
+
+  expect -c "proc abort {} {
+               puts Aborted
+               exit 1
+             }
+             spawn /bin/bash -c { signer_console init-software-token };
+             expect 'PIN: ';
+             send \"$pin\r\";
+             expect 'retype PIN: ';
+             send \"$pin\r\";
+             expect {
+                \"token initialization failed\" abort
+                \"Signer.TokenPinPolicyFailure\" abort
+                \"\\\"event\\\":\\\"Initialize the software token\\\"\"
+             }
+             "
+}
+
 function initialize_software_token() {
   local pin=$1
   export -f signer_console
 
-  # subfunction to initialize token with expect
-  function expect_initialize_software_token() {
-    expect  \
-            -c "spawn /bin/bash -c { signer_console init-software-token };
-                expect -re \"PIN\";
-                send \"$pin\r\";
-                expect -re \"retype\";
-                send \"$pin\r\";
-                expect -re \"xroad\""
-  }
-
-  # don't enter while loop if token already initialized
-  # retry initialization 10 times (signer might not be fully available)
-  COUNTER=0
-  while [ "$(signer_console list-tokens|grep -v OK)" ] || [ $COUNTER -lt 10 ]; do
-    let COUNTER=COUNTER+1
+  if [ "$(signer_console list-tokens|grep OK)" ]; then
+    log "software token already initialized"
+  else
     output=$(expect_initialize_software_token $pin)
-    if [[ "$output" != *"Software token not found"* ]]; then
-      break
-    fi
-
-    # exit if COUNT is 10, this means token initialization has failed
-    if [ $COUNTER -eq 10 ]; then
-      log "token initialization failed"
+    expect_exit=$?
+    if [ $expect_exit -eq 0 ]; then
+      log "software token initialized"
+    else
+      log "software token initialization failed\n$output"
       exit 1
     fi
-
-    sleep 0.5
-    log "retrying software token initialization"
-  done
-
-  log "software token initialized"
+  fi
 }
 
 function log_in_to_software_token () {
@@ -126,6 +163,32 @@ function log_in_to_software_token () {
   fi
 
   log "logged in to software token"
+}
+
+function register_authentication_certificate () {
+  local api_key=${created_api_key[1]}
+  local curl_args=('-H' 'accept: application/json' '-H' "Authorization: X-Road-ApiKey token=$api_key")
+  local tokens=$(curl -s -k -X GET "${curl_args[@]}" "https://localhost:4000/api/v1/tokens")
+
+  local certificate_hash=$(echo $tokens \
+    | jq -r -c '.[].keys[] | select ( .usage
+    | contains("AUTHENTICATION")).certificates[].certificate_details.hash')
+  local certificate_status=$(echo $tokens \
+    | jq -r -c '.[].keys[] | select ( .usage
+    | contains("AUTHENTICATION")).certificates[].status')
+
+  # Possible registration states are REGISTRATION_IN_PROGRESS, REGISTERED
+  if [[ "${certificate_status}" == "SAVED" ]]; then
+    log "Activating and registering authentication certificate"
+    curl -s -k -X PUT \
+      "${curl_args[@]}" \
+      "https://localhost:4000/api/v1/token-certificates/${certificate_hash}/activate"
+    curl -s -k -X PUT \
+      "${curl_args[@]}" \
+      -H 'Content-Type: application/json' \
+      -d "{\"address\":\"${PX_SS_PUBLIC_ENDPOINT}\"}" \
+      "https://localhost:4000/api/v1/token-certificates/${certificate_hash}/register"
+  fi
 }
 
 function request_certificate () {

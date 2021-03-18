@@ -16,10 +16,10 @@ RUN apt-get -qq update \
     && apt-get -qq install postgresql postgresql-contrib \
     && apt-get -qq clean
 
-ARG PX_REPOSITORY_URL=https://deb.planetcross.net/planetx
-RUN echo "deb [arch=amd64] $PX_REPOSITORY_URL `lsb_release -cs` non-free" > /etc/apt/sources.list.d/planetx.list && \
-    echo "deb http://ppa.launchpad.net/nginx/stable/ubuntu `lsb_release -cs` main" >> /etc/apt/sources.list.d/planetx.list && \
-    echo "deb http://ppa.launchpad.net/openjdk-r/ppa/ubuntu `lsb_release -cs` main" >> /etc/apt/sources.list.d/planetx.list
+ARG PX_REPOSITORY_URL=https://deb.conneqt.net/
+RUN echo "deb [arch=amd64] $PX_REPOSITORY_URL `lsb_release -cs` non-free" > /etc/apt/sources.list.d/conneqt.list && \
+    echo "deb http://ppa.launchpad.net/nginx/stable/ubuntu `lsb_release -cs` main" >> /etc/apt/sources.list.d/conneqt.list && \
+    echo "deb http://ppa.launchpad.net/openjdk-r/ppa/ubuntu `lsb_release -cs` main" >> /etc/apt/sources.list.d/conneqt.list
 
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 731E775DF768EF67 && \
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 00A6F0A3C300EE8C && \
@@ -28,9 +28,9 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 731E775DF7
 ARG PX_CANDIDATE=latest
 RUN pg_ctlcluster 10 main start \
     && apt-get update \
-    && [ "$PX_CANDIDATE" = "latest" ] && export PX_CANDIDATE=`apt policy xroad-securityserver-planetway 2>/dev/null | grep Candidate: | cut -c 14-` \
+    && [ "$PX_CANDIDATE" = "latest" ] && export PX_CANDIDATE=`apt policy xroad-securityserver-conneqt 2>/dev/null | grep Candidate: | cut -c 14-` \
     ; apt-get -y install \
-        xroad-securityserver-planetway="$PX_CANDIDATE" \
+        xroad-securityserver-conneqt="$PX_CANDIDATE" \
         xroad-securityserver="$PX_CANDIDATE" \
         xroad-addon-opmonitoring="$PX_CANDIDATE" \
         xroad-addon-hwtokens="$PX_CANDIDATE" \

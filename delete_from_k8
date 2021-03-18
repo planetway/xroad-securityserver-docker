@@ -1,0 +1,11 @@
+#!/bin/bash
+
+kubectl delete service px-ss-primary
+kubectl delete service px-ss-proxy-ui-api
+kubectl delete service px-ss-public
+kubectl delete service px-ss-secondary
+kubectl delete deployment px-ss-secondary
+kubectl delete deployment px-ss-primary
+helm uninstall postgresql
+kubectl delete pvc data-postgresql-postgresql-0
+kubectl delete pvc px-ss-pvc

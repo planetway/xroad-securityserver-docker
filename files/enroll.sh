@@ -4,7 +4,6 @@
 script_path="$( cd "$(dirname "$0")" ; pwd -P )"
 work_path=/etc/xroad/signer
 autologin_file=/etc/xroad/autologin
-enrollment_status_file=/etc/xroad/signer/enrollment.status
 ca_enrollment_endpoint=https://enroll.test.planetcross.net
 # default values for demo purpose, can be overwritten with container environment variable
 PX_MEMBER_CODE=${PX_MEMBER_CODE:-0170121212121}
@@ -20,12 +19,6 @@ for l in $libraries; do
       exit 1
 done
 
-# check enrollment status file
-if [ -f $enrollment_status_file ]; then
-  log "security server already enrolled"
-  exit 0
-fi
-
 # check for autologin file
 if [ -s $autologin_file ]; then
   software_token_pin=$(cat $autologin_file)
@@ -35,8 +28,8 @@ else
 fi
 
 # check for mandatory variables
-if [ -z $PX_INSTANCE ] || [ -z $PX_MEMBER_CLASS ] || [ -z $PX_MEMBER_CODE ]; then
-  log "variables PX_INSTANCE, PX_MEMBER_CLASS or PX_MEMBER_CODE is unset, exiting"
+if [ -z $PX_INSTANCE ] || [ -z $PX_MEMBER_CLASS ] || [ -z $PX_MEMBER_CODE ] || [ -z $PX_ADMINUI_USER ] || [ -z $PX_ADMINUI_PASSWORD ] || [ -z $PX_SS_PUBLIC_ENDPOINT ] ; then
+  log "variables PX_INSTANCE, PX_MEMBER_CLASS, PX_MEMBER_CODE, PX_ADMINUI_USER, PX_ADMINUI_PASSWORD or PX_SS_PUBLIC_ENDPOINT is unset, exiting"
   exit 1
 fi
 
@@ -46,6 +39,7 @@ cd $work_path
 # start required processes
 start_xroad_process xroad-confclient configuration-client.jar 5675
 start_xroad_process xroad-signer signer.jar 5558
+start_xroad_process xroad-proxy-ui-api proxy-ui-api.jar 4000
 
 # initialize and log in to token
 initialize_software_token $software_token_pin
@@ -67,11 +61,12 @@ request_certificate sign-${PX_MEMBER_CODE} $ca_enrollment_endpoint sign-${PX_MEM
 import_auth_certificate auth-${PX_MEMBER_CODE}
 import_sign_certificate sign-${PX_MEMBER_CODE}
 
-# create enrollment status file
-## we expect a successfull enrollment without further checks because because shell has `-e` option set in entrypoint.sh
-log "enrollment successfull, creating status file"
-touch $enrollment_status_file
+# create api key, register authentication certificate and destroy api key
+create_api_key $PX_ADMINUI_USER $PX_ADMINUI_PASSWORD
+register_authentication_certificate
+destroy_api_key $PX_ADMINUI_USER $PX_ADMINUI_PASSWORD
 
 # stop processes
 stop_xroad_process xroad-signer signer.jar
 stop_xroad_process xroad-confclient configuration-client.jar
+stop_xroad_process xroad-proxy-ui-api proxy-ui-api.jar

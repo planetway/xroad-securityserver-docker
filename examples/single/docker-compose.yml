@@ -5,10 +5,9 @@ services:
     # build:
     #   context: ../..
     #   args:
-    #     PX_REPOSITORY_URL: https://deb.planetcross.net/planetx
-    #     PX_CANDIDATE: 6.24.1-1
-    image: planetway/xroad-securityserver:6.24.1-1
-    command: bash -c "/files/initdb.sh && /files/cmd.sh"
+    #     PX_REPOSITORY_URL: https://deb.conneqt.net
+    #     PX_CANDIDATE: 6.25.0-1
+    image: conneqt/xroad-securityserver:6.25.0-1
     depends_on:
       - postgres
     environment:
@@ -17,6 +16,7 @@ services:
       - PX_MEMBER_CLASS=COM
       - PX_MEMBER_CODE=0170121212121
       - PX_SS_CODE=ss01
+      - PX_SS_PUBLIC_ENDPOINT=ss01.localdomain
       - PX_TSA_NAME=TEST of Planetway Timestamping Authority 2020
       - PX_TSA_URL=https://tsa.test.planetcross.net
       - PX_TOKEN_PIN=jXq+rlg2VS

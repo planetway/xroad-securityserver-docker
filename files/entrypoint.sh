@@ -5,6 +5,9 @@ set -e
 
 # static variables
 script_path="$( cd "$(dirname "$0")" ; pwd -P )"
+enrollment_status_file=/var/lib/xroad/enrollment.status
+initdb_status_file=/var/lib/xroad/initdb.status
+legacy_enrollment_status_file=/etc/xroad/signer/enrollment.status
 
 # include libaries
 libraries="helper_libs.sh"
@@ -102,9 +105,40 @@ perl /files/local.conf.pl >> /etc/xroad/services/local.conf
 # a="128"
 perl /files/local.ini.pl >> /etc/xroad/conf.d/local.ini
 
-if [ "$PX_ENROLL" = true ]; then
-  # Run enrollment script
-  su xroad -c "/files/enroll.sh"
+# check enrollment status file
+if [[ ! -f $initdb_status_file ]]; then
+  log "initdb status file not present, initializing database"
+
+  # initialize database
+  $script_path/initdb.sh
+
+  # create initdb status file
+  log "database initilized, creating status file"
+  touch $initdb_status_file
+else
+  log "database already initialized"
+fi
+
+if [[ "$PX_ENROLL" = true ]]; then
+  # migrate legacy enrollment status file when present
+  if [[ -f $enrollment_status_file_legacy ]]; then
+    log "migrating legacy enrollment status file"
+    mv $legacy_enrollment_status_file $enrollment_status_file
+  fi
+
+  # check enrollment status file
+  if [[ ! -f $enrollment_status_file ]]; then
+    log "enrollment status file not present, enrolling"
+
+    # Run enrollment script
+    su xroad -c "${script_path}/enroll.sh"
+
+    # create enrollment status file
+    log "enrollment successfull, creating status file"
+    touch $enrollment_status_file
+  else
+    log "security server already enrolled"
+  fi
 fi
 
 # run the CMD
