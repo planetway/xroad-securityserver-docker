@@ -111,7 +111,7 @@ We recommend to give 4GB of RAM for a Security server Docker container running w
 
 `PX_ENROLL`: A flag to enable the feature to automatically request authentication and signing certificates from the CA. See [Automatic Enrolling](#automatic-enrolling) section for details.
 
-`PX_ENROLLMENT_PASSWORD`:
+`PX_ENROLLMENT_PASSWORD`: The password to authenticate to `JP-TEST` CA to retrieve certificates automatically for automatic enrolling.
 
 `PX_PROXY_XMS`, `PX_PROXY_XMX`, `PX_PROXY_METASPACE`:
 
