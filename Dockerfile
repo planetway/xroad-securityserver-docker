@@ -30,22 +30,22 @@ RUN pg_ctlcluster 10 main start \
     && apt-get update \
     && [ "$PX_CANDIDATE" = "latest" ] && export PX_CANDIDATE=`apt policy xroad-securityserver-conneqt 2>/dev/null | grep Candidate: | cut -c 14-` \
     ; apt-get -y install \
-        xroad-securityserver-conneqt="$PX_CANDIDATE" \
-        xroad-securityserver="$PX_CANDIDATE" \
-        xroad-addon-opmonitoring="$PX_CANDIDATE" \
-        xroad-addon-hwtokens="$PX_CANDIDATE" \
-        xroad-proxy="$PX_CANDIDATE" \
-        xroad-proxy-ui-api="$PX_CANDIDATE" \
-        xroad-addon-metaservices="$PX_CANDIDATE" \
-        xroad-addon-messagelog="$PX_CANDIDATE" \
-        xroad-addon-proxymonitor="$PX_CANDIDATE" \
-        xroad-addon-wsdlvalidator="$PX_CANDIDATE" \
-        xroad-confclient="$PX_CANDIDATE" \
-        xroad-signer="$PX_CANDIDATE" \
-        xroad-base="$PX_CANDIDATE" \
-        xroad-opmonitor="$PX_CANDIDATE" \
-        xroad-monitor="$PX_CANDIDATE" \
-        xroad-autologin="$PX_CANDIDATE" \
+        xroad-securityserver-conneqt="$PX_CANDIDATE.bionic" \
+        xroad-securityserver="$PX_CANDIDATE.bionic" \
+        xroad-addon-opmonitoring="$PX_CANDIDATE.bionic" \
+        xroad-addon-hwtokens="$PX_CANDIDATE.bionic" \
+        xroad-proxy="$PX_CANDIDATE.bionic" \
+        xroad-proxy-ui-api="$PX_CANDIDATE.bionic" \
+        xroad-addon-metaservices="$PX_CANDIDATE.bionic" \
+        xroad-addon-messagelog="$PX_CANDIDATE.bionic" \
+        xroad-addon-proxymonitor="$PX_CANDIDATE.bionic" \
+        xroad-addon-wsdlvalidator="$PX_CANDIDATE.bionic" \
+        xroad-confclient="$PX_CANDIDATE.bionic" \
+        xroad-signer="$PX_CANDIDATE.bionic" \
+        xroad-base="$PX_CANDIDATE.bionic" \
+        xroad-opmonitor="$PX_CANDIDATE.bionic" \
+        xroad-monitor="$PX_CANDIDATE.bionic" \
+        xroad-autologin="$PX_CANDIDATE.bionic" \
     && apt-get -qq clean \
     && pg_ctlcluster 10 main stop
 
