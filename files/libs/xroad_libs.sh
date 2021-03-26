@@ -141,12 +141,12 @@ function request_certificate () {
     # curl -k allows untrusted HTTPS connection.
     # Flag must be removed before release when EJBCA endpoint is available from public internet with a trusted certificate.
     curl -s -L $ca_enrollment_endpoint \
-    -F user=$username \
-    -F password=$password \
-    -F "pkcs10req=
-    $(cat ${id}.csr)
-    " \
-    -F 'resulttype=4' > ${id}.crt # resulttype 4 returns full chain
+         --form-string user=$username \
+         --form-string password=$password \
+         -F "pkcs10req=
+         $(cat ${id}.csr)
+         " \
+         --form-string 'resulttype=4' > ${id}.crt # resulttype 4 returns full chain
     # Validate certificate with openssl
     openssl x509 -noout -in ${id}.crt 2> /dev/null
     # Check openssl status code, exit on failure
