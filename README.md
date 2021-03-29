@@ -1,7 +1,7 @@
 # PlanetCross Security Server Docker Image
 
 PlanetCross Security server Docker image includes the PlanetCross Security server software. The version of the PlanetCross Security server is the same as the Docker image tag.
-`planetway/xroad-securityserver:6.24.1-1` has the PlanetCross Security server version 6.24.1-1, installed on Ubuntu 18.04 .
+`planetway/xroad-securityserver:6.24.2-1` has the PlanetCross Security server version 6.24.2-1, installed on Ubuntu 18.04 .
 
 ## Usage
 
@@ -12,8 +12,7 @@ Use following docker-compose file as a minimal example.
 ```
 services:
   ss01:
-    image: planetway/xroad-securityserver:6.24.1-1
-    command: bash -c "/files/initdb.sh && /files/cmd.sh"
+    image: planetway/xroad-securityserver:6.24.2-1
     depends_on:
       - postgres
     environment:
@@ -21,6 +20,7 @@ services:
       - PX_MEMBER_CLASS=COM
       - PX_MEMBER_CODE=0170121212121
       - PX_SS_CODE=ss01
+      - PX_SS_PUBLIC_ENDPOINT=ss01.localdomain
       - PX_TSA_NAME=TEST of Planetway Timestamping Authority 2020
       - PX_TSA_URL=https://tsa.test.planetcross.net
       - PX_TOKEN_PIN=...
@@ -70,9 +70,6 @@ To start the Security server, run following command.
 docker-compose up
 ```
 
-The `/files/initdb.sh` part of the command will create PostgreSQL roles, databases and create the necessary tables.  
-The command parameter defaults to `/files/cmd.sh`, which assumes the database is already setup.
-
 Open the Security server admin UI on `https://localhost:4000/` (change localhost to docker server's host),
 and login with the credentials set as `PX_ADMINUI_USER` and `PX_ADMINUI_PASSWORD` environment variables.  
 In Chrome, you might see the "Your connection is not private" page. Click the "Advanced" button and "Proceed to localhost (unsafe)".
@@ -91,13 +88,15 @@ We recommend to give 4GB of RAM for a Security server Docker container running w
 
 `PX_SS_CODE`: The X-Road Security server code. Required. eg: `ss01`.
 
+`PX_SS_PUBLIC_ENDPOINT`: Public endpoint of X-Road Security server, used when registering security server with central server. Should be a real domain or IP.
+
 `PX_TSA_NAME`, `PX_TSA_URL`: The Timestamping authority (TSA) and URL to use. Required. If `JP-TEST` is set as `PX_INSTANCE`, you can use `TEST of Planetway Timestamping Authority 2020` as `PX_TSA_NAME`, and `https://tsa.test.planetcross.net` as `PX_TSA_URL`.
 
 `PX_TOKEN_PIN`: The PIN for the softtoken. Optional. If set, autologin is enabled. `PX_TOKEN_PIN` needs to be set when `PX_ENROLL` is true.
 
 `PX_ADMINUI_USER`, `PX_ADMINUI_PASSWORD`: The Security server admin UI user name and password. Optional. If `PX_ADMINUI_USER` and `PX_ADMINUI_PASSWORD` are both set, a unix user is be created with the user name and password. This user will be a member of `xroad-security-officer`, `xroad-registration-officer`, `xroad-service-administrator`, `xroad-system-administrator` and `xroad-securityserver-observer` unix groups.
 
-`POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_USER`, `POSTGRES_PASSWORD`: PostgreSQL host name, port, admin user name and password. Required to call `/files/initdb.sh` to initialize the database.
+`POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_USER`, `POSTGRES_PASSWORD`: PostgreSQL host name, port, admin user name and password. Required for database initialization.
 
 `PX_SERVERCONF_ADMIN_USER`, `PX_SERVERCONF_ADMIN_PASSWORD`, `PX_MESSAGELOG_ADMIN_USER`, `PX_MESSAGELOG_ADMIN_PASSWORD`, `PX_OPMONITOR_ADMIN_USER`, `PX_OPMONITOR_ADMIN_PASSWORD`: The PostgreSQL user name and password for the serverconf, messagelog and opmonitor databases, respectively. These are the user name and password of the PostgreSQL user that runs Liquibase to initialize and upgrade the database schema. Optional, and defaults to `POSTGRES_USER` and `POSTGRES_PASSWORD`.
 
@@ -181,6 +180,21 @@ ss01_1      | {"timestamp":"2020-12-21T15:32:00.006Z","level":"INFO","thread":"P
 
 Use Docker volumes or bind mount mechanisms to overwrite the logback configuration to modify the logging levels.
 Configure the Docker logging driver to forward logs to where you wish.
+
+## Kubernetes
+
+We have included kubernetes manifests (`k8-charts/` directory) for local development environment. They can be taken as a base for production deployment.
+
+Some important notes regarding kubernetes deployment:
+- Deployment include `primary` (no replicas) and `secondary` pods (n replicas).
+- The job of `primary` pod is to expose admin ui api for configuration and archive records in messagelog database.
+- The job of `secondary` pods is to expose security server as a service to consumers running inside kubernetes cluster.
+
+### Local development Environment
+
+You should have docker desktop available/running and context switched to it.
+
+Run `vagrant up` to apply manifests, use `kubectl` to check deployment/pod/service status.
 
 ## Production use
 

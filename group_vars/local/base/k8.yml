@@ -1,0 +1,7 @@
+---
+# Kubernetes settings.
+k8s_kubeconfig: "{{ lookup('env','KUBECONFIG') | default('~/.kube/config', true) }}"
+# Whether to log the details of each manifest's application to the cluster in the Ansible output.
+# Secrets and other sensitive data could be part of a manifest, so this is set to be secure by default.
+# Set to false for debugging purposes.
+k8s_no_log: true

@@ -1,0 +1,234 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: px-ss-primary
+  labels:
+    app: px-ss-primary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: px-ss-primary
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: px-ss-primary
+    spec:
+      serviceAccountName: px-ss
+      containers:
+      - name: px-ss-primary
+        # local image
+        image: px/ss:latest
+        imagePullPolicy: Never
+        #image: planetway/xroad-securityserver:6.24.2-1
+        #imagePullPolicy: IfNotPresent
+        env:
+        - name: PX_INSTANCE
+          value: 'JP-TEST'
+        - name: PX_MEMBER_CLASS
+          value: 'COM'
+        - name: PX_MEMBER_CODE
+          value: '0170121212121'
+        - name: PX_SS_CODE
+          value: 'k8-ss01'
+        - name: PX_SS_PUBLIC_ENDPOINT
+          value: 'k8-ss01.localdomain'
+        - name: PX_TSA_NAME
+          value: 'TEST of Planetway Timestamping Authority 2020'
+        - name: PX_TSA_URL
+          value: 'https://tsa.test.planetcross.net'
+        - name: PX_TOKEN_PIN
+          value: 'Secret.1234'
+        - name: PX_ADMINUI_USER
+          value: 'admin'
+        - name: PX_ADMINUI_PASSWORD
+          value: 'Secret.1234'
+        - name: POSTGRES_HOST
+          value: 'postgresql.default.svc.cluster.local'
+        - name: POSTGRES_PORT
+          value: '5432'
+        - name: POSTGRES_USER
+          value: 'postgres'
+        - name: POSTGRES_PASSWORD
+          value: 'secret'
+        - name: PX_SERVERCONF_URL
+          value: 'jdbc:postgresql://postgresql.default.svc.cluster.local:5432/serverconf'
+        - name: PX_MESSAGELOG_URL
+          value: 'jdbc:postgresql://postgresql.default.svc.cluster.local:5432/messagelog'
+        - name: PX_OPMONITOR_URL
+          value: 'jdbc:postgresql://postgresql.default.svc.cluster.local:5432/op-monitor'
+        - name: PX_SERVERCONF_PASSWORD
+          value: 'secret'
+        - name: PX_MESSAGELOG_PASSWORD
+          value: 'secret'
+        - name: PX_OPMONITOR_PASSWORD
+          value: 'secret'
+        - name: PX_POPULATE_DATABASE
+          value: 'true'
+        - name: PX_ENROLL
+          value: 'true'
+        resources:
+          limits:
+            cpu: '2'
+            memory: '2G'
+        startupProbe:
+          httpGet:
+            path: /
+            port: health
+          failureThreshold: 20
+          periodSeconds: 30
+          initialDelaySeconds: 60
+        livenessProbe:
+          httpGet:
+            path: /
+            port: health
+          periodSeconds: 5
+          initialDelaySeconds: 20
+        ports:
+          - name: proxy-ui-api
+            containerPort: 4000
+          - name: health
+            containerPort: 5588
+        volumeMounts:
+          - name: px-ss
+            mountPath: /etc/xroad/signer
+            subPath: signer
+          - name: px-ss
+            mountPath: /var/lib/xroad
+            subPath: xroad
+      volumes:
+        - name: px-ss
+          persistentVolumeClaim:
+            claimName: px-ss-pvc
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 120
+      schedulerName: default-scheduler
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: px-ss-secondary
+  labels:
+    app: px-ss-secondary
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: px-ss-secondary
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: px-ss-secondary
+    spec:
+      serviceAccountName: px-ss
+      containers:
+      - name: px-ss-secondary
+        # local image
+        image: px/ss:latest
+        imagePullPolicy: Never
+        #image: planetway/xroad-securityserver:6.24.2-1
+        #imagePullPolicy: IfNotPresent
+        env:
+        - name: PX_INSTANCE
+          value: 'JP-TEST'
+        - name: PX_MEMBER_CLASS
+          value: 'COM'
+        - name: PX_MEMBER_CODE
+          value: '0170121212121'
+        - name: PX_SS_CODE
+          value: 'k8-ss01'
+        - name: PX_SS_PUBLIC_ENDPOINT
+          value: 'k8-ss01.localdomain'
+        - name: PX_TSA_NAME
+          value: 'TEST of Planetway Timestamping Authority 2020'
+        - name: PX_TSA_URL
+          value: 'https://tsa.test.planetcross.net'
+        - name: PX_TOKEN_PIN
+          value: 'Secret.1234'
+        - name: PX_ADMINUI_USER
+          value: 'admin'
+        - name: PX_ADMINUI_PASSWORD
+          value: 'Secret.1234'
+        - name: POSTGRES_HOST
+          value: 'postgresql.default.svc.cluster.local'
+        - name: POSTGRES_PORT
+          value: '5432'
+        - name: POSTGRES_USER
+          value: 'postgres'
+        - name: POSTGRES_PASSWORD
+          value: 'secret'
+        - name: PX_SERVERCONF_URL
+          value: 'jdbc:postgresql://postgresql.default.svc.cluster.local:5432/serverconf'
+        - name: PX_MESSAGELOG_URL
+          value: 'jdbc:postgresql://postgresql.default.svc.cluster.local:5432/messagelog'
+        - name: PX_OPMONITOR_URL
+          value: 'jdbc:postgresql://postgresql.default.svc.cluster.local:5432/op-monitor'
+        - name: PX_SERVERCONF_PASSWORD
+          value: 'secret'
+        - name: PX_MESSAGELOG_PASSWORD
+          value: 'secret'
+        - name: PX_OPMONITOR_PASSWORD
+          value: 'secret'
+        - name: PX_POPULATE_DATABASE
+          value: 'true'
+        - name: PX_ENROLL
+          value: 'true'
+        - name: PX_NODE_TYPE
+          value: 'secondary'
+        resources:
+          limits:
+            cpu: '1'
+            memory: '2G'
+        startupProbe:
+          httpGet:
+            path: /
+            port: health
+          failureThreshold: 20
+          periodSeconds: 30
+          initialDelaySeconds: 60
+        livenessProbe:
+          httpGet:
+            path: /
+            port: health
+          periodSeconds: 5
+          initialDelaySeconds: 20
+        ports:
+          - name: http
+            containerPort: 80
+          - name: https
+            containerPort: 443
+          - name: message-exch
+            containerPort: 5500
+          - name: ocsp
+            containerPort: 5577
+          - name: health
+            containerPort: 5588
+        volumeMounts:
+          - name: px-ss
+            mountPath: /etc/xroad/signer
+            subPath: signer
+          - name: px-ss
+            mountPath: /var/lib/xroad
+            subPath: xroad
+      initContainers:
+        - name: init-px-ss-secondary
+          image: curlimages/curl:7.74.0
+          command: ['sh', '-c', "until curl -s --connect-timeout 5 http://${PX_SS_PRIMARY_SERVICE_HOST}:${PX_SS_PRIMARY_SERVICE_PORT}; do echo waiting for px-ss-primary; sleep 5; done"]
+      volumes:
+        - name: px-ss
+          persistentVolumeClaim:
+            claimName: px-ss-pvc
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 120
+      schedulerName: default-scheduler
