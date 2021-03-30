@@ -104,6 +104,8 @@ We recommend to give 4GB of RAM for a Security server Docker container running w
 
 `PX_SERVERCONF_PASSWORD`, `PX_MESSAGELOG_PASSWORD`, `PX_OPMONITOR_PASSWORD`: serverconf, messagelog and opmonitor user password. Required.
 
+`PX_SERVERCONF_URL`, `PX_MESSAGELOG_URL`, `PX_OPMONITOR_URL`: JDBC URL for serverconf, messagelog and opmonitor databases. Optional, and defaults to `jdbc:postgresql://postgres:5432/serverconf`, `jdbc:postgresql://postgres:5432/messagelog` and `jdbc:postgresql://postgres:5432/op-monitor` respectively.
+
 `PX_CHECKDB_USER`, `PX_CHECKDB_PASSWORD`: The PostgreSQL user name and password to check if the databases exist. Set these to `PX_SERVERCONF_USER` and `PX_SERVERCONF_PASSWORD` when you know the database is already set up, and you do not want to put the PostgreSQL admin user name and password in the environment variables. Optional, and defaults to `POSTGRES_USER` and `POSTGRES_PASSWORD`.
 
 `PX_POPULATE_DATABASE`: A flag to enable the feature to populate the database to initialize the Security server. Optional, and defaults to false.
