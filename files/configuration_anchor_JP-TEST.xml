@@ -3,7 +3,7 @@
     <generatedAt>2020-01-20T14:16:29.618Z</generatedAt>
     <instanceIdentifier>JP-TEST</instanceIdentifier>
     <source>
-        <downloadURL>http://central-1.test.planetcross.net/internalconf</downloadURL>
+        <downloadURL>http://central.test.planetcross.net/internalconf</downloadURL>
         <verificationCert>MIICqTCCAZGgAwIBAgIBATANBgkqhkiG9w0BAQ0FADAOMQwwCgYDVQQDDANOL0EwHhcNNzAwMTAxMDAwMDAwWhcNMzgwMTAxMDAwMDAwWjAOMQwwCgYDVQQDDANOL0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCpEgzXrOQmKgarfSvH14yWWs/6oesa5mHyc3MDMdYL/76l1+FdIPyaWnWWIe2EnY8Guu0uFRj5FqHgSCLSmuWMurJUp1i59TA612FL1++yiAtDwDPQuu7HDQk3vk7bgWBtHhaia/+DJVFsMHJew5GO3cm7im6Bu+A0lSvb0r9TdG/QsYE2sWDEmEic/4J2yGRCJ5WyTzf8mkXvAs2Y/5ZD9SRvdosTEwcnDbUHTRUfBXZ6panXWU58gQKVepxKX5kUMOmJ4/0jH8UV0WwnCXtjwXLlyUuOfPAOMZyKB55MLrNB+80NmwuIXA/BZsVZGqgD7AdcKqVpkX9waNir0WW/AgMBAAGjEjAQMA4GA1UdDwEB/wQEAwIGQDANBgkqhkiG9w0BAQ0FAAOCAQEAejjzFhTmSYAHfRYApM0kZO4rgdvHv4vLOVlPYsyQE9Vle4FIjDSgWsV978qM4fePDZGGGgbR5TnGQiFL+npMl7NdvTQjd7uEAOJiqCXT9/gt2yeOLxrd/osy6kqBro5FU3OgrPaLZKnste06AvdkJgbDthImDmbILw8kzJ4Bs8pIUw7cKGWrEcCxQn300JR828NZW+d1aqiiJKhwv7h9VCJRdc3H4wJz1/c4r9GLFZB1n+ZiEWymS5LwXh3I1GWIyIWt85avUPv4YnjlFF23MaPk1yK7Wth/bQ4CWZcSBpYu5EBJzn+XoSEyRGIYpDuvHcnkEhgpzlMq+cLMhpYeyQ==</verificationCert>
     </source>
 </ns3:configurationAnchor>
