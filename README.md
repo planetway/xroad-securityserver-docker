@@ -19,20 +19,21 @@ services:
       - PX_INSTANCE=JP-TEST
       - PX_MEMBER_CLASS=COM
       - PX_MEMBER_CODE=0170121212121
+      # - PX_MEMBER_ENROLLMENT_PASSWORD={enrollment password from console.conneqt.net}
       - PX_SS_CODE=ss01
       - PX_SS_PUBLIC_ENDPOINT=ss01.localdomain
       - PX_TSA_NAME=TEST of Planetway Timestamping Authority 2020
       - PX_TSA_URL=https://tsa.test.planetcross.net
-      - PX_TOKEN_PIN=...
+      - PX_TOKEN_PIN=p@ssw0rd123
       - PX_ADMINUI_USER=admin
-      - PX_ADMINUI_PASSWORD=...
+      - PX_ADMINUI_PASSWORD=password
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
-      - PX_SERVERCONF_PASSWORD=...
-      - PX_MESSAGELOG_PASSWORD=...
-      - PX_OPMONITOR_PASSWORD=...
+      - PX_SERVERCONF_PASSWORD=password
+      - PX_MESSAGELOG_PASSWORD=password
+      - PX_OPMONITOR_PASSWORD=password
       - PX_POPULATE_DATABASE=true
       - PX_ENROLL=true
     ports:
