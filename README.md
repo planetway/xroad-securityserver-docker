@@ -212,6 +212,6 @@ Contact us for technical support.
 
 ## License, Terms of Use
 
-By downloading the Docker image, you represent that you have read, understood and agreed to be bound by the [Conneqt License Agreement](https://planetway.com/legal/PX_License_Agreement.pdf).
+By downloading the Docker image, you represent that you have read, understood and agreed to be bound by the [Terms of Use](https://secure-dx.biz/terms.html).
 
 The files in this repository are licensed under [MIT License](LICENSE).
