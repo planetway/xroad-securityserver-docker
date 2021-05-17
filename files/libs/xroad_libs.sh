@@ -41,6 +41,18 @@ function destroy_api_key () {
     "https://localhost:4000/api/v1/api-keys/${api_key_id}"
 }
 
+function request_api () {
+  local verb=$1
+  local path=$2
+  local body=$3
+
+  local api_key=${created_api_key[1]}
+  local curl_args=('-H' 'Content-Type: application/json' '-H' "Authorization: X-Road-ApiKey token=$api_key")
+  api_response=$(curl -s -k -i -X $verb --data "$body" "${curl_args[@]}" "https://localhost:4000/api/v1$path")
+  api_response_status_code=$(echo -e "${api_response}"|head -n 1|cut -d$' ' -f2)
+  api_response_body=$(echo -e "${api_response}"|tail -n 1)
+}
+
 function generate_csr () {
   local type=$1
   local id=$(readlink $type|cut -d . -f "1")
@@ -103,45 +115,30 @@ function import_sign_certificate () {
   fi
 }
 
-# subfunction to initialize token with expect
-# short password will cause Signer.TokenPinPolicyFailure
-# we're expecting {"event":"Initialize the software token",...}
-function expect_initialize_software_token() {
-  local pin=$1
-  export -f signer_console
-
-  expect -c "proc abort {} {
-               puts Aborted
-               exit 1
-             }
-             spawn /bin/bash -c { signer_console init-software-token };
-             expect 'PIN: ';
-             send \"$pin\r\";
-             expect 'retype PIN: ';
-             send \"$pin\r\";
-             expect {
-                \"token initialization failed\" abort
-                \"Signer.TokenPinPolicyFailure\" abort
-                \"\\\"event\\\":\\\"Initialize the software token\\\"\"
-             }
-             "
-}
 
 function initialize_software_token() {
   local pin=$1
-  export -f signer_console
 
-  if [ "$(signer_console list-tokens|grep OK)" ]; then
-    log "software token already initialized"
-  else
-    output=$(expect_initialize_software_token $pin)
-    expect_exit=$?
-    if [ $expect_exit -eq 0 ]; then
-      log "software token initialized"
+  request_api GET "/initialization/status"
+  if [ $api_response_status_code = 200 ]; then
+    software_token_init_status=$(echo $api_response_body | jq -r '.software_token_init_status')
+    if [ $software_token_init_status = NOT_INITIALIZED ]; then
+      software_token_pin=$(cat $autologin_file)
+      request_api POST "/initialization" "{\"software_token_pin\": \"$software_token_pin\", \"ignore_warnings\": true}"
+      if [ $api_response_status_code = 201 ]; then
+        log "Software token created"
+      else
+        log "Warning, Could not initialize software token. $api_response_body"
+        exit 1
+      fi
+    elif [ $software_token_init_status = INITIALIZED ]; then
+      log "Software token initialized"
     else
-      log "software token initialization failed\n$output"
-      exit 1
+      log "Warning, unknown software_token_init_status: $software_token_init_status"
     fi
+  else
+    log "Warning, Could not get initialization status. $api_response_body"
+    exit 1
   fi
 }
 

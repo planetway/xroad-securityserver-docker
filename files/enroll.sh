@@ -41,6 +41,9 @@ start_xroad_process xroad-confclient configuration-client.jar 5675
 start_xroad_process xroad-signer signer.jar 5558
 start_xroad_process xroad-proxy-ui-api proxy-ui-api.jar 4000
 
+# create api key to setup security server over https
+create_api_key $PX_ADMINUI_USER $PX_ADMINUI_PASSWORD
+
 # initialize and log in to token
 initialize_software_token $software_token_pin
 log_in_to_software_token $software_token_pin
@@ -61,9 +64,10 @@ request_certificate sign-${PX_MEMBER_CODE} $ca_enrollment_endpoint sign-${PX_MEM
 import_auth_certificate auth-${PX_MEMBER_CODE}
 import_sign_certificate sign-${PX_MEMBER_CODE}
 
-# create api key, register authentication certificate and destroy api key
-create_api_key $PX_ADMINUI_USER $PX_ADMINUI_PASSWORD
+#register authentication certificate
 register_authentication_certificate
+
+# Destroy api key, done seting up the security server
 destroy_api_key $PX_ADMINUI_USER $PX_ADMINUI_PASSWORD
 
 # stop processes
