@@ -38,20 +38,3 @@ log "Running messagelog database migrations"
 
 /usr/share/xroad/scripts/setup_messagelog_db.sh \
     || die -1 "Connection messagelog has failed, please check database availability and configuration in ${db_properties} file"
-
-serverconf () {
-    PGPASSWORD=$PX_SERVERCONF_PASSWORD psql -h $POSTGRES_HOST -p $POSTGRES_PORT -U serverconf -d serverconf -c "$1"
-}
-
-if [[ -n "${PX_INSTANCE}" && -n "${PX_MEMBER_CLASS}" && -n "${PX_MEMBER_CODE}" && -n "${PX_SS_CODE}" && "${PX_POPULATE_DATABASE}" == "true" ]]
-then
-    log "Populating serverconf database"
-
-    serverconf "INSERT INTO identifier VALUES ('1', 'C', 'MEMBER', '${PX_INSTANCE}','${PX_MEMBER_CLASS}','${PX_MEMBER_CODE}') ON CONFLICT (id) DO NOTHING"
-    serverconf "INSERT INTO serverconf VALUES ('1', '${PX_SS_CODE}') ON CONFLICT (id) DO NOTHING"
-    serverconf "INSERT INTO client VALUES ('1', '1', '1', 'saved', 'NOSSL') ON CONFLICT (id) DO NOTHING"
-    serverconf "UPDATE serverconf SET owner=1 WHERE id=1 AND 0=(SELECT COUNT(*) FROM serverconf WHERE owner=1)"
-    serverconf "INSERT INTO tsp VALUES ('1', '${PX_TSA_NAME}', '${PX_TSA_URL}', '1') ON CONFLICT (id) DO NOTHING"
-else
-    log "Skipping populating serverconf database"
-fi

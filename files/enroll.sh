@@ -45,27 +45,24 @@ start_xroad_process xroad-proxy-ui-api proxy-ui-api.jar 4000
 create_api_key $PX_ADMINUI_USER $PX_ADMINUI_PASSWORD
 
 # initialize and log in to token
-initialize_software_token $software_token_pin
-log_in_to_software_token $software_token_pin
+initialize_security_server $software_token_pin
 
-# generate keys
-generate_key auth-${PX_MEMBER_CODE}
-generate_key sign-${PX_MEMBER_CODE}
+add_timestamping_service
 
-# generate certificate signing requests
-generate_csr auth-${PX_MEMBER_CODE}
-generate_csr sign-${PX_MEMBER_CODE}
+token_login
+
+# generate keys and csrs
+generate_key_and_csr auth
+generate_key_and_csr sign
 
 # request certificates from CA
-request_certificate auth-${PX_MEMBER_CODE} $ca_enrollment_endpoint auth-${PX_MEMBER_CODE} $PX_MEMBER_ENROLLMENT_PASSWORD
-request_certificate sign-${PX_MEMBER_CODE} $ca_enrollment_endpoint sign-${PX_MEMBER_CODE} $PX_MEMBER_ENROLLMENT_PASSWORD
+request_certificate auth $ca_enrollment_endpoint $PX_MEMBER_ENROLLMENT_PASSWORD
+request_certificate sign $ca_enrollment_endpoint $PX_MEMBER_ENROLLMENT_PASSWORD
 
-# import certificates
-import_auth_certificate auth-${PX_MEMBER_CODE}
-import_sign_certificate sign-${PX_MEMBER_CODE}
-
-#register authentication certificate
-register_authentication_certificate
+# imports auth certificate, activates and registers it
+import_certificate auth
+# imports sign certificate
+import_certificate sign
 
 # Destroy api key, done seting up the security server
 destroy_api_key $PX_ADMINUI_USER $PX_ADMINUI_PASSWORD
