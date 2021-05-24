@@ -59,10 +59,10 @@ generate_key_and_csr sign
 request_certificate auth $ca_enrollment_endpoint $PX_MEMBER_ENROLLMENT_PASSWORD
 request_certificate sign $ca_enrollment_endpoint $PX_MEMBER_ENROLLMENT_PASSWORD
 
-# imports auth certificate, activates and registers it
-import_certificate auth
 # imports sign certificate
 import_certificate sign
+# imports auth certificate, activates and registers it
+import_certificate auth
 
 # Destroy api key, done seting up the security server
 destroy_api_key $PX_ADMINUI_USER $PX_ADMINUI_PASSWORD

@@ -198,14 +198,6 @@ function import_certificate () {
       request_api PUT "/token-certificates/$crt_hash/register" "{\"address\":\"${PX_SS_PUBLIC_ENDPOINT}\"}"
       if [ $api_response_status_code = 204 ]; then
         log "Auth certificate registered"
-        # NB! content-type must be application/x-www-form-urlencoded
-        # NB! and body must be the hash
-        # NB! they might fix this in the future
-        # api_response=$(curl -i -s -k -X PUT -H "Authorization: X-Road-ApiKey token=$api_key" \
-        # -H "Content-Type: application/x-www-form-urlencoded" -d "$crt_hash" \
-        # https://localhost:4000/api/v1/token-certificates/$crt_hash/activate)
-        # api_response_status_code=$(echo -e "$api_response"|head -n 1|cut -d$' ' -f2)
-        # api_response_body=$(echo -e "$api_response"|tail -n 1)
         request_api PUT "/token-certificates/$crt_hash/activate"
         if [ $api_response_status_code = 204 ]; then
           log "Auth certificate activated"
