@@ -213,7 +213,7 @@ function import_certificate () {
           log "Warning, Could not activate certificate $type-${PX_MEMBER_CODE}.crt. $api_response_body"
         fi
       else
-        log "Warning, Cound not register certificate. hash: $crt_hash $api_response_body"
+        log "Warning, Could not register certificate. hash: $crt_hash $api_response_body"
       fi
     fi
   else
