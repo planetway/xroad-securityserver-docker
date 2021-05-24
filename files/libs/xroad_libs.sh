@@ -5,6 +5,8 @@
 # e.g.
 #   . ./xroad_libs.sh
 
+Q_CERTS_FOLDER=/etc/xroad/signer/
+
 #
 # functions
 
@@ -133,8 +135,8 @@ function generate_key_and_csr () {
   request_api POST "/tokens/0/keys-with-csrs" "$data"
   if [ $api_response_status_code = 200 ]; then
     csr_data=($(echo "$api_response_body" | jq -r -c '.key.id,.csr_id'))
-    csr_path="/tmp/$type-$PX_MEMBER_CODE.csr"
-    # download csr to /tmp
+    csr_path="$Q_CERTS_FOLDER/$type-$PX_MEMBER_CODE.csr"
+    # download csr to $Q_CERTS_FOLDER
     $(curl -s -k -H "Authorization: X-Road-ApiKey token=${created_api_key[1]}" \
     https://localhost:4000/api/v1/keys/${csr_data[0]}/csrs/${csr_data[1]}?csr_format=PEM -o $csr_path)
 
@@ -153,8 +155,8 @@ function request_certificate () {
   local ca_enrollment_endpoint=$2
   local username="$type-$PX_MEMBER_CODE"
   local password=$3
-  local csr_path="/tmp/$type-${PX_MEMBER_CODE}.csr"
-  local crt_path="/tmp/$type-${PX_MEMBER_CODE}.crt"
+  local csr_path="$Q_CERTS_FOLDER/$type-${PX_MEMBER_CODE}.csr"
+  local crt_path="$Q_CERTS_FOLDER/$type-${PX_MEMBER_CODE}.crt"
 
   # request certificate if it doesn't exists
   if [ ! -f $crt_path ]; then
@@ -179,7 +181,7 @@ function request_certificate () {
 
 function import_certificate () {
   local type=$1
-  local crt_path="/tmp/$type-${PX_MEMBER_CODE}.crt"
+  local crt_path="$Q_CERTS_FOLDER/$type-${PX_MEMBER_CODE}.crt"
   log "Importing $type certificate for $PX_MEMBER_CODE"
 
   local api_key=${created_api_key[1]}
@@ -199,11 +201,12 @@ function import_certificate () {
         # NB! content-type must be application/x-www-form-urlencoded
         # NB! and body must be the hash
         # NB! they might fix this in the future
-        api_response=$(curl -i -s -k -X PUT -H "Authorization: X-Road-ApiKey token=$api_key" \
-        -H "Content-Type: application/x-www-form-urlencoded" -d "$crt_hash" \
-        https://localhost:4000/api/v1/token-certificates/$crt_hash/activate)
-        api_response_status_code=$(echo -e "$api_response"|head -n 1|cut -d$' ' -f2)
-        api_response_body=$(echo -e "$api_response"|tail -n 1)
+        # api_response=$(curl -i -s -k -X PUT -H "Authorization: X-Road-ApiKey token=$api_key" \
+        # -H "Content-Type: application/x-www-form-urlencoded" -d "$crt_hash" \
+        # https://localhost:4000/api/v1/token-certificates/$crt_hash/activate)
+        # api_response_status_code=$(echo -e "$api_response"|head -n 1|cut -d$' ' -f2)
+        # api_response_body=$(echo -e "$api_response"|tail -n 1)
+        request_api PUT "/token-certificates/$crt_hash/activate"
         if [ $api_response_status_code = 204 ]; then
           log "Auth certificate activated"
         else
@@ -216,9 +219,6 @@ function import_certificate () {
   else
     log "Warning, Could not upload certificate $type-${PX_MEMBER_CODE}.crt. $api_response_body"
   fi
-
-  # cleanup
-  rm -f /tmp/$type-${PX_MEMBER_CODE}.c*
 }
 
 function start_xroad_process () {

@@ -2,12 +2,12 @@ version: '3.7'
 
 services:
   ss01:
-    # build:
-    #   context: ../..
-    #   args:
-    #     PX_REPOSITORY_URL: https://deb.conneqt.net
-    #     PX_CANDIDATE: 6.25.0-1
-    image: conneqt/xroad-securityserver:6.25.0-1
+    build:
+      context: ../..
+      args:
+        PX_REPOSITORY_URL: https://deb.conneqt.net
+        PX_CANDIDATE: 6.25.0-1
+    # image: conneqt/xroad-securityserver:6.25.0-1
     depends_on:
       - postgres
     environment:
@@ -15,7 +15,7 @@ services:
       - PX_MEMBER_CLASS=COM
       - PX_MEMBER_CODE=0170121212121
       # - PX_MEMBER_ENROLLMENT_PASSWORD={enrollment password from console.conneqt.net}
-      - PX_SS_CODE=ss01
+      - PX_SS_CODE=margus01
       - PX_SS_PUBLIC_ENDPOINT=ss01.localdomain
       - PX_TSA_NAME=TEST of Planetway Timestamping Authority 2020
       - PX_TSA_URL=https://tsa.test.planetcross.net
@@ -49,6 +49,7 @@ services:
       - "px-ss-signer:/etc/xroad/signer"
       # mlog.zip files are stored here, and ./backup contains backups
       - "px-ss-xroad:/var/lib/xroad"
+      - "/Users/margus.raim/src/xroad-securityserver-docker:/margus"
 
   postgres:
     image: postgres:10
