@@ -19,6 +19,7 @@ services:
       - PX_SS_PUBLIC_ENDPOINT=ss01.localdomain
       - PX_TSA_NAME=TEST of Planetway Timestamping Authority 2020
       - PX_TSA_URL=https://tsa.test.planetcross.net
+      - PX_CA_NAME=TEST of Planetway Root CA 2020
       - PX_TOKEN_PIN=p@ssw0rd123
       - PX_ADMINUI_USER=admin
       - PX_ADMINUI_PASSWORD=password

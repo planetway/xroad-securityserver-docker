@@ -105,7 +105,7 @@ perl /files/local.conf.pl >> /etc/xroad/services/local.conf
 # a="128"
 perl /files/local.ini.pl >> /etc/xroad/conf.d/local.ini
 
-# check enrollment status file
+# check init database status file
 if [[ ! -f $initdb_status_file ]]; then
   log "initdb status file not present, initializing database"
 
