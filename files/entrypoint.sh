@@ -12,6 +12,7 @@ legacy_enrollment_status_file=/etc/xroad/signer/enrollment.status
 # include libaries
 libraries="helper_libs.sh"
 for l in $libraries; do
+  # shellcheck source=./files/libs/helper_libs.sh
   . "$script_path/libs/$l"
     test $? -ne 0 &&\
       echo "failed loading $l from '$l'" &&\
@@ -37,7 +38,7 @@ else
 fi
 
 if [ "$PX_INSTANCE" = "JP" ]; then
-    cp /files/configuration_anchor_$PX_INSTANCE.xml /etc/xroad/configuration-anchor.xml
+    cp /files/configuration_anchor_"$PX_INSTANCE".xml /etc/xroad/configuration-anchor.xml
 else
     cp /files/configuration_anchor_JP-TEST.xml /etc/xroad/configuration-anchor.xml
 fi
@@ -68,8 +69,9 @@ fi
 # Create admin ui user
 if [[ -n "${PX_ADMINUI_USER}" && -n "${PX_ADMINUI_PASSWORD}" || -e /run/secrets/adminui-user && -e /run/secrets/adminui-password ]]; then
     if [[ -e /run/secrets/adminui-user && -e /run/secrets/adminui-password ]]; then
-        declare PX_ADMINUI_USER=$(cat /run/secrets/adminui-user)
-        declare PX_ADMINUI_PASSWORD=$(cat /run/secrets/adminui-password)
+        PX_ADMINUI_USER=$(cat /run/secrets/adminui-user)
+        PX_ADMINUI_PASSWORD=$(cat /run/secrets/adminui-password)
+        declare PX_ADMINUI_USER PX_ADMINUI_PASSWORD
     fi
     if useradd "$PX_ADMINUI_USER" -s /usr/sbin/nologin; then
         echo "$PX_ADMINUI_USER:$PX_ADMINUI_PASSWORD" | chpasswd
@@ -78,7 +80,7 @@ if [[ -n "${PX_ADMINUI_USER}" && -n "${PX_ADMINUI_PASSWORD}" || -e /run/secrets/
         do
             usermod -aG "$i" "${PX_ADMINUI_USER}"
         done
-        log "Created Admin UI user "${PX_ADMINUI_USER}""
+        log "Created Admin UI user ${PX_ADMINUI_USER}"
     else
         log "Admin UI user already exists."
     fi
@@ -110,7 +112,7 @@ if [[ ! -f $initdb_status_file ]]; then
   log "initdb status file not present, initializing database"
 
   # initialize database
-  $script_path/initdb.sh
+  "$script_path"/initdb.sh
 
   # create initdb status file
   log "database initilized, creating status file"
@@ -121,7 +123,7 @@ fi
 
 if [[ "$PX_ENROLL" = true ]]; then
   # migrate legacy enrollment status file when present
-  if [[ -f $enrollment_status_file_legacy ]]; then
+  if [[ -f $legacy_enrollment_status_file ]]; then
     log "migrating legacy enrollment status file"
     mv $legacy_enrollment_status_file $enrollment_status_file
   fi

@@ -11,6 +11,7 @@ script_path="$( cd "$(dirname "$0")" ; pwd -P )"
 # include libaries
 libraries="helper_libs.sh"
 for l in $libraries; do
+  # shellcheck source=./files/libs/helper_libs.sh
   . "$script_path/libs/$l"
     test $? -ne 0 &&\
       echo "failed loading $l from '$l'" &&\

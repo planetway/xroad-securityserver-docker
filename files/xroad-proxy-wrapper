@@ -3,6 +3,6 @@
 # WORKAROUND for `setpriv: libcap-ng is too old for "all" caps`, previously "-all" was used here
 # create a list to drop all capabilities supported by current kernel
 cap_prefix="-cap_"
-caps="$cap_prefix$(seq -s ",$cap_prefix" 0 $(cat /proc/sys/kernel/cap_last_cap))"
+caps="$cap_prefix$(seq -s ",$cap_prefix" 0 "$(cat /proc/sys/kernel/cap_last_cap)")"
 
 exec /usr/bin/setpriv --reuid=xroad --regid=xroad --init-groups --inh-caps=$caps,+NET_BIND_SERVICE --ambient-caps=$caps,+NET_BIND_SERVICE /usr/share/xroad/bin/xroad-proxy
