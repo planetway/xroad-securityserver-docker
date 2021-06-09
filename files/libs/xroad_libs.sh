@@ -194,7 +194,8 @@ function import_certificate () {
     log "Uploaded $type-${PX_MEMBER_CODE}.crt"
     if [ $type = auth ]; then
       # register and activate auth cert only
-      crt_hash=$(echo $api_response_body|jq -r '.certificate_details.hash')
+      # replace \, with , using sed, to avoid jq parse failure, should be cleaned in proxy-ui-api instead
+      crt_hash=$(echo $api_response_body|sed 's/\\,/,/g'|jq -r '.certificate_details.hash')
       request_api PUT "/token-certificates/$crt_hash/register" "{\"address\":\"${PX_SS_PUBLIC_ENDPOINT}\"}"
       if [ $api_response_status_code = 204 ]; then
         log "Auth certificate registered"
