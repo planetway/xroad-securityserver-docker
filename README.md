@@ -24,6 +24,7 @@ services:
       - PX_SS_PUBLIC_ENDPOINT=ss01.localdomain
       - PX_TSA_NAME=TEST of Planetway Timestamping Authority 2020
       - PX_TSA_URL=https://tsa.test.planetcross.net
+      - PX_CA_NAME=TEST of Planetway Root CA 2021
       - PX_TOKEN_PIN=p@ssw0rd123
       - PX_ADMINUI_USER=admin
       - PX_ADMINUI_PASSWORD=password
@@ -92,6 +93,8 @@ We recommend to give 4GB of RAM for a Security server Docker container running w
 `PX_SS_PUBLIC_ENDPOINT`: Public endpoint of X-Road Security server, used when registering security server with central server. Should be a real domain or IP.
 
 `PX_TSA_NAME`, `PX_TSA_URL`: The Timestamping authority (TSA) and URL to use. Required. If `JP-TEST` is set as `PX_INSTANCE`, you can use `TEST of Planetway Timestamping Authority 2020` as `PX_TSA_NAME`, and `https://tsa.test.planetcross.net` as `PX_TSA_URL`.
+
+`PX_CA_NAME`: The root ca approved by conneqt instance. Required. If `JP-TEST` is set as `PX_INSTANCE`, you can use `TEST of Planetway Root CA 2021` as `PX_CA_NAME`.
 
 `PX_TOKEN_PIN`: The PIN for the softtoken. Optional. If set, autologin is enabled. `PX_TOKEN_PIN` needs to be set when `PX_ENROLL` is true.
 

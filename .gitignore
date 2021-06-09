@@ -1,5 +1,6 @@
 examples/volumes/
 tmp/
+.vagrant
 
 # docker save
 *.gz
