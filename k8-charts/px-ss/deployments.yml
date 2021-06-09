@@ -24,10 +24,10 @@ spec:
       containers:
       - name: px-ss-primary
         # local image
-        image: px/ss:latest
-        imagePullPolicy: Never
-        #image: conneqt/xroad-securityserver:6.25.0-1
-        #imagePullPolicy: IfNotPresent
+        # image: px/ss:latest
+        # imagePullPolicy: Never
+        image: conneqt/xroad-securityserver:6.25.0-1.0d0406b.881319b6
+        imagePullPolicy: IfNotPresent
         env:
         - name: PX_INSTANCE
           value: 'JP-TEST'
@@ -43,12 +43,14 @@ spec:
           value: 'TEST of Planetway Timestamping Authority 2020'
         - name: PX_TSA_URL
           value: 'https://tsa.test.planetcross.net'
+        - name: PX_CA_NAME
+          value: 'TEST of Planetway Root CA 2021'
         - name: PX_TOKEN_PIN
-          value: 'Secret.1234'
+          value: 'p@ssw0rd123'
         - name: PX_ADMINUI_USER
           value: 'admin'
         - name: PX_ADMINUI_PASSWORD
-          value: 'Secret.1234'
+          value: 'password'
         - name: POSTGRES_HOST
           value: 'postgresql.default.svc.cluster.local'
         - name: POSTGRES_PORT
@@ -77,19 +79,24 @@ spec:
           limits:
             cpu: '2'
             memory: '2G'
-        startupProbe:
-          httpGet:
-            path: /
-            port: health
-          failureThreshold: 20
-          periodSeconds: 30
-          initialDelaySeconds: 60
         livenessProbe:
           httpGet:
             path: /
             port: health
-          periodSeconds: 5
-          initialDelaySeconds: 20
+          initialDelaySeconds: 300
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+          successThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /
+            port: health
+          initialDelaySeconds: 300
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+          successThreshold: 1
         ports:
           - name: proxy-ui-api
             containerPort: 4000
@@ -117,7 +124,7 @@ metadata:
   labels:
     app: px-ss-secondary
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: px-ss-secondary
@@ -135,10 +142,10 @@ spec:
       containers:
       - name: px-ss-secondary
         # local image
-        image: px/ss:latest
-        imagePullPolicy: Never
-        #image: conneqt/xroad-securityserver:6.25.0-1
-        #imagePullPolicy: IfNotPresent
+        # image: px/ss:latest
+        # imagePullPolicy: Never
+        image: conneqt/xroad-securityserver:6.25.0-1.0d0406b.881319b6
+        imagePullPolicy: IfNotPresent
         env:
         - name: PX_INSTANCE
           value: 'JP-TEST'
@@ -154,6 +161,8 @@ spec:
           value: 'TEST of Planetway Timestamping Authority 2020'
         - name: PX_TSA_URL
           value: 'https://tsa.test.planetcross.net'
+        - name: PX_CA_NAME
+          value: 'TEST of Planetway Root CA 2021'
         - name: PX_TOKEN_PIN
           value: 'Secret.1234'
         - name: PX_ADMINUI_USER
@@ -190,19 +199,24 @@ spec:
           limits:
             cpu: '1'
             memory: '2G'
-        startupProbe:
-          httpGet:
-            path: /
-            port: health
-          failureThreshold: 20
-          periodSeconds: 30
-          initialDelaySeconds: 60
         livenessProbe:
           httpGet:
             path: /
             port: health
-          periodSeconds: 5
-          initialDelaySeconds: 20
+          initialDelaySeconds: 300
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+          successThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /
+            port: health
+          initialDelaySeconds: 300
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+          successThreshold: 1
         ports:
           - name: http
             containerPort: 80
@@ -223,7 +237,7 @@ spec:
             subPath: xroad
       initContainers:
         - name: init-px-ss-secondary
-          image: curlimages/curl:7.74.0
+          image: curlimages/curl:7.77.0
           command: ['sh', '-c', "until curl -s --connect-timeout 5 http://${PX_SS_PRIMARY_SERVICE_HOST}:${PX_SS_PRIMARY_SERVICE_PORT}; do echo waiting for px-ss-primary; sleep 5; done"]
       volumes:
         - name: px-ss
