@@ -198,6 +198,19 @@ Some important notes regarding kubernetes deployment:
 
 ### Local development Environment
 
+#### Requirements
+You should ensure that you have `helm` installed and `openshift`:
+
+Install `helm`
+```
+brew install helm
+```
+
+Install `openshift`
+```
+pip3 install -r requirements.txt
+```
+
 You should have docker desktop available/running and context switched to it.
 
 Run `vagrant up` to apply manifests, use `kubectl` to check deployment/pod/service status.
