@@ -164,11 +164,11 @@ spec:
         - name: PX_CA_NAME
           value: 'TEST of Planetway Root CA 2021'
         - name: PX_TOKEN_PIN
-          value: 'Secret.1234'
+          value: 'p@ssw0rd123'
         - name: PX_ADMINUI_USER
           value: 'admin'
         - name: PX_ADMINUI_PASSWORD
-          value: 'Secret.1234'
+          value: 'password'
         - name: POSTGRES_HOST
           value: 'postgresql.default.svc.cluster.local'
         - name: POSTGRES_PORT
