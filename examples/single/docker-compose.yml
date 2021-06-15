@@ -2,12 +2,12 @@ version: '3.7'
 
 services:
   ss01:
-    #build:
-    # context: ../..
-    # args:
-    #   PX_REPOSITORY_URL: https://deb.conneqt.net
-    #   PX_CANDIDATE: 6.25.0-1
-    image: conneqt/xroad-securityserver:6.25.0-1
+    # build:
+    #   context: ../..
+    #   args:
+    #     PX_REPOSITORY_URL: https://deb.conneqt.net
+    #     PX_CANDIDATE: 6.26.0-1
+    image: conneqt/xroad-securityserver:6.26.0-1
     depends_on:
       - postgres
     environment:

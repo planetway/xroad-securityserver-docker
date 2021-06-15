@@ -26,7 +26,7 @@ spec:
         # local image
         # image: px/ss:latest
         # imagePullPolicy: Never
-        image: conneqt/xroad-securityserver:6.25.0-1.0d0406b.881319b6
+        image: conneqt/xroad-securityserver:6.26.0-1
         imagePullPolicy: IfNotPresent
         env:
         - name: PX_INSTANCE
@@ -78,7 +78,7 @@ spec:
         resources:
           limits:
             cpu: '2'
-            memory: '2G'
+            memory: '4G'
         livenessProbe:
           httpGet:
             path: /
@@ -144,7 +144,7 @@ spec:
         # local image
         # image: px/ss:latest
         # imagePullPolicy: Never
-        image: conneqt/xroad-securityserver:6.25.0-1.0d0406b.881319b6
+        image: conneqt/xroad-securityserver:6.26.0-1
         imagePullPolicy: IfNotPresent
         env:
         - name: PX_INSTANCE
