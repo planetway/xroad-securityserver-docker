@@ -1,7 +1,7 @@
 # Conneqt Security Server Docker Image
 
 Conneqt Security server Docker image includes the Conneqt Security server software. The version of the Conneqt Security server is the same as the Docker image tag.
-`conneqt/xroad-securityserver:6.25.0-1` has the Conneqt Security server version 6.25.0-1, installed on Ubuntu 18.04 .
+`conneqt/xroad-securityserver:6.26.0-1` has the Conneqt Security server version 6.26.0-1, installed on Ubuntu 18.04 .
 
 ## Usage
 
@@ -12,7 +12,7 @@ Use following docker-compose file as a minimal example.
 ```
 services:
   ss01:
-    image: conneqt/xroad-securityserver:6.25.0-1
+    image: conneqt/xroad-securityserver:6.26.0-1
     depends_on:
       - postgres
     environment:
