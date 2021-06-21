@@ -36,6 +36,8 @@ services:
       - AWS_SECRET_ACCESS_KEY=
       # edit the bucket
       - PX_INI_MESSAGELOG_ARCHIVE_TRANSFER_COMMAND=aws s3 sync --sse --exclude \"*\" --include \"*.zip\" /var/lib/xroad s3://bucket/lib/xroad && find /var/lib/xroad -name \"*.zip\" -mtime +2 -delete
+      # uncomment to enable verbose logging when enrolling
+      # - PX_TRACE_ENROLL=1
     ports:
       - "2080:2080"
       - "4000:4000"

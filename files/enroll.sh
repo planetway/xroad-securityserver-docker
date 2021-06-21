@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# verbose logging
+[[ $PX_TRACE_ENROLL ]] && set -x
+
 # static variables
 script_path="$( cd "$(dirname "$0")" || exit ; pwd -P )"
 work_path=/etc/xroad/signer
