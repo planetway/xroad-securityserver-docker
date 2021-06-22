@@ -222,7 +222,11 @@ function start_xroad_process () {
   # start process if not running
   if ! pgrep -f $java_archive > /dev/null; then
     log "starting $start_script"
-    /usr/share/xroad/bin/${start_script} > /dev/null 2>&1 &
+    if [[ $PX_TRACE_ENROLL ]]; then
+        /usr/share/xroad/bin/${start_script} &
+    else
+        /usr/share/xroad/bin/${start_script} > /dev/null 2>&1 &
+    fi
   fi
 
   # wait for listening state of process
