@@ -5,7 +5,7 @@
 # e.g.
 #   . ./xroad_libs.sh
 
-Q_CERTS_FOLDER=/etc/xroad/signer/
+Q_CERTS_FOLDER=/etc/xroad/signer
 
 #
 # functions
@@ -55,10 +55,7 @@ function request_api () {
   api_response_body=$(echo -e "${api_response}"|tail -n 1)
 }
 
-
 function initialize_security_server() {
-  local pin=$1
-
   request_api GET "/initialization/status"
   if [ $api_response_status_code = 200 ]; then
     software_token_init_status=$(echo $api_response_body | jq -r '.software_token_init_status')

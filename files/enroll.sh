@@ -50,7 +50,7 @@ start_xroad_process xroad-proxy-ui-api proxy-ui-api.jar 4000
 create_api_key "$PX_ADMINUI_USER" "$PX_ADMINUI_PASSWORD"
 
 # initialize and log in to token
-initialize_security_server "$software_token_pin"
+initialize_security_server
 
 add_timestamping_service
 
