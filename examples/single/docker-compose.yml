@@ -39,7 +39,6 @@ services:
       # uncomment to enable verbose logging when enrolling
       # - PX_TRACE_ENROLL=1
     ports:
-      - "2080:2080"
       - "4000:4000"
       - "5500:5500"
       - "5577:5577"
