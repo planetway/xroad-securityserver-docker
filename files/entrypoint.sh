@@ -121,7 +121,7 @@ else
   log "database already initialized"
 fi
 
-if [[ "$PX_ENROLL" = true ]]; then
+if [[ "$PX_ENROLL" = true ]] && [[ "$PX_NODE_TYPE" != "secondary" ]]; then
   # migrate legacy enrollment status file when present
   if [[ -f $legacy_enrollment_status_file ]]; then
     log "migrating legacy enrollment status file"
