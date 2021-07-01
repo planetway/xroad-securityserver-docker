@@ -25,7 +25,7 @@ function create_api_key () {
     "https://localhost:4000/api/v1/api-keys" | jq -r -c '.id,.key'))
 
   if [[ -z $created_api_key ]] ; then
-    log "Warning, API key request failed, exiting"
+    log "Error, API key request failed, exiting"
     exit 1
   else
     log "API key request successful"
@@ -74,7 +74,7 @@ function initialize_security_server_try() {
       if [ $api_response_status_code = 201 ]; then
         log "Software token created"
       else
-        log "Warning, could not initialize software token. $api_response_body"
+        log "Error, could not initialize software token. $api_response_body"
         exit 1
       fi
     elif [ $software_token_init_status = INITIALIZED ]; then
@@ -84,7 +84,7 @@ function initialize_security_server_try() {
       log "Unexpected software_token_init_status: $software_token_init_status"
     fi
   else
-    log "Warning, could not get initialization status. $api_response_body"
+    log "Error, could not get initialization status. $api_response_body"
     exit 1
   fi
 }
@@ -121,7 +121,7 @@ function add_timestamping_service() {
   printf -v data "$tpl" "$PX_TSA_NAME" "$PX_TSA_URL"
   request_api POST "/system/timestamping-services" "$data"
   if [[ $api_response_status_code -ne 201 ]]; then
-    log "Warning, could not add timestamping service. $api_response_body"
+    log "Error, could not add timestamping service. $api_response_body"
     exit 1
   fi
 }
@@ -166,11 +166,11 @@ function generate_key_and_csr () {
     if [ -f "$csr_path" ]; then
       log "CSR created for type $key_usage_type."
     else
-      log "Warning, could not download csr for type $key_usage_type. csr_id: ${csr_data[1]}"
+      log "Error, could not download csr for type $key_usage_type. csr_id: ${csr_data[1]}"
       exit 1
     fi
   else
-    log "Warning, could not create csr for type $key_usage_type. $api_response_body"
+    log "Error, could not create csr for type $key_usage_type. $api_response_body"
     exit 1
   fi
 }
@@ -228,17 +228,17 @@ function import_certificate () {
         if [ $api_response_status_code = 204 ]; then
           log "Auth certificate activated"
         else
-          log "Warning, could not activate certificate $type-${PX_MEMBER_CODE}.crt. $api_response_body"
+          log "Error, could not activate certificate $type-${PX_MEMBER_CODE}.crt. $api_response_body"
           exit 1
         fi
       else
         # register can fail for example when the PX_SS_PUBLIC_ENDPOINT is in invalid format.
-        log "Warning, could not register certificate. hash: $crt_hash $api_response_body"
+        log "Error, could not register certificate. hash: $crt_hash $api_response_body"
         exit 1
       fi
     fi
   else
-    log "Warning, could not upload certificate $type-${PX_MEMBER_CODE}.crt. $api_response_body"
+    log "Error, could not upload certificate $type-${PX_MEMBER_CODE}.crt. $api_response_body"
     exit 1
   fi
 }
