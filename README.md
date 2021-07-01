@@ -38,7 +38,6 @@ services:
       - PX_POPULATE_DATABASE=true
       - PX_ENROLL=true
     ports:
-      - "2080:2080"
       - "4000:4000"
       - "5500:5500"
       - "5577:5577"
