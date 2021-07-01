@@ -121,7 +121,8 @@ function add_timestamping_service() {
   printf -v data "$tpl" "$PX_TSA_NAME" "$PX_TSA_URL"
   request_api POST "/system/timestamping-services" "$data"
   if [[ $api_response_status_code -ne 201 ]]; then
-    log "Warning, Could not add timestamping service. $api_response_body"
+    log "Warning, could not add timestamping service. $api_response_body"
+    exit 1
   fi
 }
 
@@ -165,10 +166,12 @@ function generate_key_and_csr () {
     if [ -f "$csr_path" ]; then
       log "CSR created for type $key_usage_type."
     else
-      log "Warning, Could not download csr for type $key_usage_type. csr_id: ${csr_data[1]}"
+      log "Warning, could not download csr for type $key_usage_type. csr_id: ${csr_data[1]}"
+      exit 1
     fi
   else
-    log "Warning, Could not create csr for type $key_usage_type. $api_response_body"
+    log "Warning, could not create csr for type $key_usage_type. $api_response_body"
+    exit 1
   fi
 }
 
@@ -225,14 +228,18 @@ function import_certificate () {
         if [ $api_response_status_code = 204 ]; then
           log "Auth certificate activated"
         else
-          log "Warning, Could not activate certificate $type-${PX_MEMBER_CODE}.crt. $api_response_body"
+          log "Warning, could not activate certificate $type-${PX_MEMBER_CODE}.crt. $api_response_body"
+          exit 1
         fi
       else
-        log "Warning, Could not register certificate. hash: $crt_hash $api_response_body"
+        # register can fail for example when the PX_SS_PUBLIC_ENDPOINT is in invalid format.
+        log "Warning, could not register certificate. hash: $crt_hash $api_response_body"
+        exit 1
       fi
     fi
   else
-    log "Warning, Could not upload certificate $type-${PX_MEMBER_CODE}.crt. $api_response_body"
+    log "Warning, could not upload certificate $type-${PX_MEMBER_CODE}.crt. $api_response_body"
+    exit 1
   fi
 }
 
