@@ -25,7 +25,7 @@ function create_api_key () {
     "https://localhost:4000/api/v1/api-keys" | jq -r -c '.id,.key'))
 
   if [[ -z $created_api_key ]] ; then
-    log "Warning, API key request failed, exiting"
+    log "Error, API key request failed, exiting"
     exit 1
   else
     log "API key request successful"
@@ -55,7 +55,7 @@ function request_api () {
   api_response_body=$(echo -e "${api_response}"|tail -n 1)
 }
 
-function initialize_security_server() {
+function initialize_security_server_try() {
   request_api GET "/initialization/status"
   if [ $api_response_status_code = 200 ]; then
     software_token_init_status=$(echo $api_response_body | jq -r '.software_token_init_status')
@@ -69,21 +69,46 @@ function initialize_security_server() {
   "ignore_warnings": true
 }'
       printf -v data "$tpl" "$PX_MEMBER_CLASS" "$PX_MEMBER_CODE" "$PX_SS_CODE" "$software_token_pin"
-      # creates entris to serverconf db, initializes software token and does token login
+      # creates entries in serverconf db, initializes software token and does token login
       request_api POST /initialization "$data"
       if [ $api_response_status_code = 201 ]; then
         log "Software token created"
       else
-        log "Warning, Could not initialize software token. $api_response_body"
+        log "Error, could not initialize software token. $api_response_body"
         exit 1
       fi
     elif [ $software_token_init_status = INITIALIZED ]; then
       log "Software token initialized"
     else
-      log "Warning, unknown software_token_init_status: $software_token_init_status"
+      # Before "X-Road Proxy Admin REST API" logs "Signer is available", API can respond with software_token_init_status: UNKNOWN.
+      log "Unexpected software_token_init_status: $software_token_init_status"
     fi
   else
-    log "Warning, Could not get initialization status. $api_response_body"
+    log "Error, could not get initialization status. $api_response_body"
+    exit 1
+  fi
+}
+
+function initialize_security_server() {
+  local n=0
+  # can wait max 5 x 15 seconds
+  local max_retries=5
+  local sleep_interval=15
+  software_token_init_status=""
+
+  until [ $n -ge $max_retries ]; do
+    initialize_security_server_try
+    if [ $software_token_init_status != UNKNOWN ]; then
+      # success
+      break
+    fi
+    log "Retrying initialize after $sleep_interval seconds"
+    n=$((n+1))
+    sleep $sleep_interval
+  done
+
+  if [ $n -eq $max_retries ]; then
+    log "Retry max exceeded"
     exit 1
   fi
 }
@@ -96,7 +121,8 @@ function add_timestamping_service() {
   printf -v data "$tpl" "$PX_TSA_NAME" "$PX_TSA_URL"
   request_api POST "/system/timestamping-services" "$data"
   if [[ $api_response_status_code -ne 201 ]]; then
-    log "Warning, Could not add timestamping service. $api_response_body"
+    log "Error, could not add timestamping service. $api_response_body"
+    exit 1
   fi
 }
 
@@ -140,10 +166,12 @@ function generate_key_and_csr () {
     if [ -f "$csr_path" ]; then
       log "CSR created for type $key_usage_type."
     else
-      log "Warning, Could not download csr for type $key_usage_type. csr_id: ${csr_data[1]}"
+      log "Error, could not download csr for type $key_usage_type. csr_id: ${csr_data[1]}"
+      exit 1
     fi
   else
-    log "Warning, Could not create csr for type $key_usage_type. $api_response_body"
+    log "Error, could not create csr for type $key_usage_type. $api_response_body"
+    exit 1
   fi
 }
 
@@ -200,14 +228,18 @@ function import_certificate () {
         if [ $api_response_status_code = 204 ]; then
           log "Auth certificate activated"
         else
-          log "Warning, Could not activate certificate $type-${PX_MEMBER_CODE}.crt. $api_response_body"
+          log "Error, could not activate certificate $type-${PX_MEMBER_CODE}.crt. $api_response_body"
+          exit 1
         fi
       else
-        log "Warning, Could not register certificate. hash: $crt_hash $api_response_body"
+        # register can fail for example when the PX_SS_PUBLIC_ENDPOINT is in invalid format.
+        log "Error, could not register certificate. hash: $crt_hash $api_response_body"
+        exit 1
       fi
     fi
   else
-    log "Warning, Could not upload certificate $type-${PX_MEMBER_CODE}.crt. $api_response_body"
+    log "Error, could not upload certificate $type-${PX_MEMBER_CODE}.crt. $api_response_body"
+    exit 1
   fi
 }
 

@@ -25,9 +25,7 @@ for l in $libraries; do
 done
 
 # check for autologin file
-if [ -s $autologin_file ]; then
-  software_token_pin=$(cat $autologin_file)
-else
+if [ ! -s $autologin_file ]; then
   log "autologin file not found (PX_TOKEN_PIN not set?) or is empty, exiting"
   exit 1
 fi
