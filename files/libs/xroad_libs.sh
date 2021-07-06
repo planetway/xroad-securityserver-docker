@@ -120,9 +120,13 @@ function add_timestamping_service() {
 }'
   printf -v data "$tpl" "$PX_TSA_NAME" "$PX_TSA_URL"
   request_api POST "/system/timestamping-services" "$data"
-  if [[ $api_response_status_code -ne 201 ]]; then
-    log "Error, could not add timestamping service. $api_response_body"
-    exit 1
+  if [[ $api_response_status_code -eq 201 ]]; then
+      log "Added timestamping service ${PX_TSA_NAME}"
+  elif [[ $api_response_status_code -eq 409 ]]; then
+      log "Timestamping service already exists"
+  else
+      log "Error, could not add timestamping service. $api_response_body"
+      exit 1
   fi
 }
 
