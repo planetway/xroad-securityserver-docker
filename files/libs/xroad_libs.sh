@@ -56,11 +56,11 @@ function request_api () {
 }
 
 function initialize_security_server_try() {
+  local software_token_pin=$(cat $autologin_file)
   request_api GET "/initialization/status"
   if [ $api_response_status_code = 200 ]; then
     software_token_init_status=$(echo $api_response_body | jq -r '.software_token_init_status')
     if [ $software_token_init_status = NOT_INITIALIZED ]; then
-      software_token_pin=$(cat $autologin_file)
       tpl='{
   "owner_member_class": "%s",
   "owner_member_code": "%s",
@@ -131,6 +131,7 @@ function add_timestamping_service() {
 }
 
 function token_login() {
+  local software_token_pin=$(cat $autologin_file)
   request_api PUT "/tokens/0/login" "{\"password\": \"$software_token_pin\"}"
 }
 
