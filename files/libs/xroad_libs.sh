@@ -120,9 +120,13 @@ function add_timestamping_service() {
 }'
   printf -v data "$tpl" "$PX_TSA_NAME" "$PX_TSA_URL"
   request_api POST "/system/timestamping-services" "$data"
-  if [[ $api_response_status_code -ne 201 ]]; then
-    log "Error, could not add timestamping service. $api_response_body"
-    exit 1
+  if [[ $api_response_status_code -eq 201 ]]; then
+      log "Added timestamping service ${PX_TSA_NAME}"
+  elif [[ $api_response_status_code -eq 409 ]]; then
+      log "Timestamping service already exists"
+  else
+      log "Error, could not add timestamping service. $api_response_body"
+      exit 1
   fi
 }
 
@@ -132,6 +136,7 @@ function token_login() {
 
 function generate_key_and_csr () {
   local type=$1
+  local code=""
   if [ $type = auth ]; then
     local key_usage_type=AUTHENTICATION
   else 
@@ -156,7 +161,7 @@ function generate_key_and_csr () {
 
   # assume token id: 0
   request_api POST "/tokens/0/keys-with-csrs" "$data"
-  if [ $api_response_status_code = 200 ]; then
+  if [[ $api_response_status_code -eq 200 ]]; then
     csr_data=($(echo "$api_response_body" | jq -r -c '.key.id,.csr_id'))
     csr_path="$Q_CERTS_FOLDER/$type-$PX_MEMBER_CODE.csr"
     # download csr to $Q_CERTS_FOLDER
@@ -167,6 +172,14 @@ function generate_key_and_csr () {
       log "CSR created for type $key_usage_type."
     else
       log "Error, could not download csr for type $key_usage_type. csr_id: ${csr_data[1]}"
+      exit 1
+    fi
+  elif [[ $api_response_status_code -eq 409 ]]; then
+    code=($(echo "$api_response_body" | jq -r -c '.error.code'))
+    if [[ $code = "action_not_possible" ]]; then
+      log "$type key already exists"
+    else
+      log "Error, could not create csr for type $key_usage_type. $api_response_body"
       exit 1
     fi
   else
@@ -206,6 +219,7 @@ function request_certificate () {
 
 function import_certificate () {
   local type=$1
+  local code=""
   local crt_path="$Q_CERTS_FOLDER/$type-${PX_MEMBER_CODE}.crt"
   log "Importing $type certificate for $PX_MEMBER_CODE"
 
@@ -215,7 +229,7 @@ function import_certificate () {
   api_response_status_code=$(echo -e "$api_response"|head -n 3|tail -n 1|cut -d$' ' -f2)
   api_response_body=$(echo -e "$api_response"|tail -n 1)
 
-  if [ $api_response_status_code = 201 ]; then
+  if [[ $api_response_status_code -eq 201 ]]; then
     log "Uploaded $type-${PX_MEMBER_CODE}.crt"
     if [ $type = auth ]; then
       # register and activate auth cert only
@@ -236,6 +250,14 @@ function import_certificate () {
         log "Error, could not register certificate. hash: $crt_hash $api_response_body"
         exit 1
       fi
+    fi
+  elif [[ $api_response_status_code -eq 409 ]]; then
+    code=($(echo "$api_response_body" | jq -r -c '.error.code'))
+    if [[ $code = "certificate_already_exists" ]]; then
+      log "$type certificate already exists"
+    else
+      log "Error, could not upload certificate $type-${PX_MEMBER_CODE}.crt. $api_response_body"
+      exit 1
     fi
   else
     log "Error, could not upload certificate $type-${PX_MEMBER_CODE}.crt. $api_response_body"
