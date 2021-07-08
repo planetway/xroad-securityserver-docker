@@ -135,6 +135,7 @@ resource "aws_lb" "external" {
   subnets            = data.aws_subnet_ids.public.ids
 
   enable_deletion_protection = var.termination_protection
+  enable_cross_zone_load_balancing = true
 
   // TODO
   // access_logs {
@@ -151,6 +152,7 @@ resource "aws_lb" "internal" {
   subnets            = data.aws_subnet_ids.private.ids
 
   enable_deletion_protection = var.termination_protection
+  enable_cross_zone_load_balancing = true
 
   // TODO
   // access_logs {
