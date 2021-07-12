@@ -190,7 +190,7 @@ data "template_file" "container_definition_primary" {
     awslogs_group = aws_cloudwatch_log_group.ss-primary.name
     awslogs_region = var.region
     awslogs_stream_prefix = "${var.name_prefix}-primary"
-    public_endpoint = aws_lb.external.dns_name
+    public_endpoint = aws_route53_record.external.fqdn
     node_type = "primary"
   }
 }
@@ -208,7 +208,7 @@ data "template_file" "container_definition_secondary" {
     awslogs_group = aws_cloudwatch_log_group.ss-secondary.name
     awslogs_region = var.region
     awslogs_stream_prefix = "${var.name_prefix}-secondary"
-    public_endpoint = aws_lb.external.dns_name
+    public_endpoint = aws_route53_record.external.fqdn
     node_type = "secondary"
   }
 }

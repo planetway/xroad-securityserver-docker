@@ -48,6 +48,13 @@ module "db" {
   publicly_accessible = "false"
 
   apply_immediately = "true"
+
+  parameters = [
+    {
+      name = "max_connections"
+      value = "100"
+    }
+  ]
 }
 
 # create unique id for database snapshot
