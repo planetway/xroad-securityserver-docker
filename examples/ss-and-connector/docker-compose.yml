@@ -1,0 +1,102 @@
+version: '3.7'
+
+services:
+  ss01:
+    image: conneqt/xroad-securityserver:6.26.0-1
+    depends_on:
+      - postgres
+    environment:
+      - PX_INSTANCE=JP-TEST
+      - PX_MEMBER_CLASS=COM
+      - PX_MEMBER_CODE=0170121212121
+      # - PX_MEMBER_ENROLLMENT_PASSWORD={enrollment password from console.conneqt.net}
+      - PX_SS_CODE=ss01.local
+      - PX_SS_PUBLIC_ENDPOINT=localhost
+      - PX_TSA_NAME=TEST of Planetway Timestamping Authority 2020
+      - PX_TSA_URL=https://tsa.test.planetcross.net
+      - PX_CA_NAME=TEST of Planetway Root CA 2021
+      - PX_TOKEN_PIN=p@ssw0rd123
+      - PX_ADMINUI_USER=admin
+      - PX_ADMINUI_PASSWORD=password
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - PX_SERVERCONF_PASSWORD=password
+      - PX_MESSAGELOG_PASSWORD=password
+      - PX_OPMONITOR_PASSWORD=password
+      - PX_POPULATE_DATABASE=true
+      - PX_ENROLL=true
+      - AWS_ACCESS_KEY_ID=
+      - AWS_SECRET_ACCESS_KEY=
+      # edit the bucket
+      - PX_INI_MESSAGELOG_ARCHIVE_TRANSFER_COMMAND=aws s3 sync --sse --exclude \"*\" --include \"*.zip\" /var/lib/xroad s3://bucket/lib/xroad && find /var/lib/xroad -name \"*.zip\" -mtime +2 -delete
+      # uncomment to enable verbose logging when enrolling
+      # - PX_TRACE_ENROLL=1
+    ports:
+      - "4000:4000"
+      - "5500:5500"
+      - "5577:5577"
+      - "5588:5588"
+      - "8000:80"
+      - "8443:443"
+    volumes:
+      # .p12 files and keyconf.xml
+      - "px-ss-signer:/etc/xroad/signer"
+      # mlog.zip files are stored here, and ./backup contains backups
+      - "px-ss-xroad:/var/lib/xroad"
+
+  admin-api:
+    image: conneqt/connector-admin-api
+    environment:
+      CONNECTOR_ADMIN_USERNAME: admin
+      CONNECTOR_ADMIN_PASSWORD: password
+      CONNECTOR_PROXY_LOADBALANCER_URL: http://proxy:8085
+      CONNECTOR_PROXY_ACTUATOR_URL: http://proxy:8081
+    ports:
+      - 8082:8082
+    volumes:
+      - "./services.json:/etc/conneqt/connector/services.json"
+
+  admin-ui:
+    image: conneqt/connector-admin-ui
+    environment:
+      CONNECTOR_ADMIN_API_HOST: admin-api
+      CONNECTOR_ADMIN_API_PORT: 8082
+    ports:
+      - 8543:443
+    depends_on:
+      - admin-api
+
+  proxy:
+    image: conneqt/connector-proxy
+    ports:
+      - 8085:8085
+    volumes:
+      - "./services.json:/etc/conneqt/connector/services.json"
+
+  mysql:
+    image: mysql
+    environment:
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: connector
+    volumes:
+      - ./0_create.sql:/docker-entrypoint-initdb.d/0_create.sql
+    ports:
+      - 3306:3306
+
+  postgres:
+    image: postgres:10
+    environment:
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - "px-ss-postgres:/var/lib/postgresql/data"
+
+volumes:
+  px-ss-postgres:
+  px-ss-signer:
+  px-ss-xroad:
