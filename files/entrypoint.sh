@@ -9,6 +9,9 @@ enrollment_status_file=/var/lib/xroad/enrollment.status
 initdb_status_file=/var/lib/xroad/initdb.status
 legacy_enrollment_status_file=/etc/xroad/signer/enrollment.status
 
+# validate.sh exits non zero when there's a problem in environment variables
+"${script_path}/validate.sh"
+
 # include libaries
 libraries="helper_libs.sh"
 for l in $libraries; do
