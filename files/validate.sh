@@ -20,6 +20,12 @@ if [[ "$PX_ENROLL" = "true" ]]; then
       log "PX_ENROLL is only available in JP-TEST environment, either set PX_ENROLL to false or try in JP-TEST environment"
       exit 1
   fi
+
+  # check for mandatory variables
+  if [ -z "$PX_TOKEN_PIN" ] || [ -z "$PX_INSTANCE" ] || [ -z "$PX_MEMBER_CLASS" ] || [ -z "$PX_MEMBER_CODE" ] || [ -z "$PX_ADMINUI_USER" ] || [ -z "$PX_ADMINUI_PASSWORD" ] || [ -z "$PX_SS_PUBLIC_ENDPOINT" ] ; then
+    log "One of PX_TOKEN_PIN, PX_INSTANCE, PX_MEMBER_CLASS, PX_MEMBER_CODE, PX_ADMINUI_USER, PX_ADMINUI_PASSWORD or PX_SS_PUBLIC_ENDPOINT is unset, all of these are required to enroll"
+    exit 1
+  fi
 fi
 
 if [[ $PX_SS_PUBLIC_ENDPOINT == *"/"* ]]; then
