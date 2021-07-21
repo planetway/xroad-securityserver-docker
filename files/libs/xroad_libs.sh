@@ -55,22 +55,28 @@ function request_api () {
   api_response_body=$(echo -e "${api_response}"|tail -n 1)
 }
 
-function initialize_security_server_try() {
+function initialize_security_server_post() {
   local software_token_pin=$(cat $autologin_file)
-  request_api GET "/initialization/status"
-  if [ $api_response_status_code = 200 ]; then
-    software_token_init_status=$(echo $api_response_body | jq -r '.software_token_init_status')
-    if [ $software_token_init_status = NOT_INITIALIZED ]; then
-      tpl='{
+  local tpl='{
   "owner_member_class": "%s",
   "owner_member_code": "%s",
   "security_server_code": "%s",
   "software_token_pin": "%s",
   "ignore_warnings": true
 }'
-      printf -v data "$tpl" "$PX_MEMBER_CLASS" "$PX_MEMBER_CODE" "$PX_SS_CODE" "$software_token_pin"
-      # creates entries in serverconf db, initializes software token and does token login
-      request_api POST /initialization "$data"
+  local data
+  printf -v data "$tpl" "$PX_MEMBER_CLASS" "$PX_MEMBER_CODE" "$PX_SS_CODE" "$software_token_pin"
+  # creates entries in serverconf db, initializes software token and does token login
+  request_api POST /initialization "$data"
+}
+
+function initialize_security_server_try() {
+  request_api GET "/initialization/status"
+  if [ $api_response_status_code = 200 ]; then
+    # this is used in the caller function
+    software_token_init_status=$(echo $api_response_body | jq -r '.software_token_init_status')
+    if [[ $software_token_init_status = "NOT_INITIALIZED" ]]; then
+      initialize_security_server_post
       if [ $api_response_status_code = 201 ]; then
         log "Software token created"
       else
@@ -78,6 +84,17 @@ function initialize_security_server_try() {
         exit 1
       fi
     elif [ $software_token_init_status = INITIALIZED ]; then
+      local is_server_code_initialized=$(echo $api_response_body | jq -r '.is_server_code_initialized')
+      local is_server_owner_initialized=$(echo $api_response_body | jq -r '.is_server_owner_initialized')
+      if [[ $is_server_code_initialized = "false" ]] || [[ $is_server_owner_initialized = "false" ]]; then
+        # when the response body of GET /initialization/status says (is_server_code_initialized:false or is_server_owner_initialized:false) AND software_token_init_status:INITIALIZED,
+        # and still we try to POST /initialize, SS returns:
+        # {"status":400,"error":{"code":"invalid_init_params","metadata":["pin_code_exists"]}}
+        # also in this situation when we try to initialize through the UI, it shows
+        # "Invalid initialisation parameters pin_code_exists" and we cannot recover.
+        log "Error, the softtoken is already initialized, but the database is not. Please 1) backup the /etc/xroad/signer directory if needed, 2) clear the files in /etc/xroad/signer directory, and try again."
+        exit 1
+      fi
       log "Software token initialized"
     else
       # Before "X-Road Proxy Admin REST API" logs "Signer is available", API can respond with software_token_init_status: UNKNOWN.

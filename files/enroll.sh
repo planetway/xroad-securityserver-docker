@@ -24,18 +24,6 @@ for l in $libraries; do
       exit 1
 done
 
-# check for autologin file
-if [ ! -s $autologin_file ]; then
-  log "autologin file not found (PX_TOKEN_PIN not set?) or is empty, exiting"
-  exit 1
-fi
-
-# check for mandatory variables
-if [ -z "$PX_INSTANCE" ] || [ -z "$PX_MEMBER_CLASS" ] || [ -z "$PX_MEMBER_CODE" ] || [ -z "$PX_ADMINUI_USER" ] || [ -z "$PX_ADMINUI_PASSWORD" ] || [ -z "$PX_SS_PUBLIC_ENDPOINT" ] ; then
-  log "variables PX_INSTANCE, PX_MEMBER_CLASS, PX_MEMBER_CODE, PX_ADMINUI_USER, PX_ADMINUI_PASSWORD or PX_SS_PUBLIC_ENDPOINT is unset, exiting"
-  exit 1
-fi
-
 # set work path
 cd $work_path || exit
 
