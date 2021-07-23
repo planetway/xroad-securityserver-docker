@@ -69,5 +69,9 @@ RUN cp /files/logback/addons/* /etc/xroad/conf.d/addons/
 
 EXPOSE 80 443 2080 4000 5500 5577 5588 8083
 
+# max 5min
+HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=10 \
+  CMD curl -f http://localhost:5588/ || exit 1
+
 ENTRYPOINT ["/files/entrypoint.sh"]
 CMD ["/files/cmd.sh"]

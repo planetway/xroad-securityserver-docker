@@ -9,3 +9,4 @@ down-single:
 
 test:
 	perl tests/test.pl
+	tests/examples.sh
