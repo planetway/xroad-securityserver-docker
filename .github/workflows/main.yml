@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - master
+      - '*'
   workflow_dispatch:
 
 jobs:
@@ -31,7 +31,10 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          context: ./examples/single/
+          context: .
+          build-args: |
+            PX_REPOSITORY_URL=https://deb.conneqt.net
+            PX_CANDIDATE=6.26.0-1
           push: false
           tags: conneqt/xroad-securityserver:latest
           cache-from: type=local,src=/tmp/.buildx-cache
