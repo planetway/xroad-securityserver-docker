@@ -7,7 +7,7 @@ services:
     #   args:
     #     PX_REPOSITORY_URL: https://deb.conneqt.net
     #     PX_CANDIDATE: 6.26.0-1
-    image: conneqt/xroad-securityserver:6.26.0-1
+    image: conneqt/xroad-securityserver
     depends_on:
       - postgres
     environment:
