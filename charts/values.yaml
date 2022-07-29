@@ -1,0 +1,11 @@
+xroadSecurityServer:
+  extraVolumeMounts:
+    - name: security-server
+      mountPath: /etc/xroad/signer
+      subPath: signer
+    - name: security-server
+      mountPath: /var/lib/xroad
+      subPath: xroad
+  extraVolumes:
+    - name: security-server
+      emptyDir: {}

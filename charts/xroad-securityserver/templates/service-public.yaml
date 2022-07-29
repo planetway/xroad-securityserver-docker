@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "xroad-securityserver.fullname" . }}-public
+  {{- with $.Values.xroadSecurityServer.service.public.annotations }}
+  annotations:
+    {{- toYaml . | nindent 8 }}
+  {{- end }}
+  labels:
+    {{- include "xroad-securityserver.labels" . | nindent 4 }}-public
+spec:
+  type: {{ $.Values.xroadSecurityServer.service.public.type }}
+  ports:
+    - port: 5500
+      targetPort: message-exchange
+      protocol: TCP
+      name: message-exchange
+    - port: 5577
+      targetPort: ocsp
+      protocol: TCP
+      name: ocsp
+  selector:
+    {{- include "xroad-securityserver-common-service.selectorLabels" . | nindent 4 }}
