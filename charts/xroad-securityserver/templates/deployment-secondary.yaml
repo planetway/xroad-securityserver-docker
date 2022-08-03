@@ -56,12 +56,12 @@ spec:
             httpGet:
               path: /
               port: health
-            initialDelaySeconds: 600
+            initialDelaySeconds: 60
           readinessProbe:
             httpGet:
               path: /
               port: health
-            initialDelaySeconds: 600
+            initialDelaySeconds: 60
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with $.Values.xroadSecurityServer.extraVolumeMounts }}
