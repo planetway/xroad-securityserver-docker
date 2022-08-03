@@ -16,8 +16,8 @@ spec:
       protocol: TCP
       name: http
     - port: 443
-      targetPort: http
+      targetPort: https
       protocol: TCP
-      name: http
+      name: https
   selector:
     {{- include "xroad-securityserver-common-service.selectorLabels" . | nindent 4 }}

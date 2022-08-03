@@ -12,9 +12,9 @@ spec:
   type: {{ $.Values.xroadSecurityServer.service.public.type }}
   ports:
     - port: 5500
-      targetPort: message-exchange
+      targetPort: message-exch
       protocol: TCP
-      name: message-exchange
+      name: message-exch
     - port: 5577
       targetPort: ocsp
       protocol: TCP

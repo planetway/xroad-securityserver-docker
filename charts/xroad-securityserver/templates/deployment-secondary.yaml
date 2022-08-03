@@ -34,6 +34,12 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: PX_NODE_TYPE
+              value: 'secondary'
+          {{- with $.Values.xroadSecurityServer.secondary.env }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           ports:
             - name: http
               containerPort: 80
@@ -50,16 +56,22 @@ spec:
             httpGet:
               path: /
               port: health
+            initialDelaySeconds: 600
           readinessProbe:
             httpGet:
               path: /
               port: health
+            initialDelaySeconds: 600
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with $.Values.xroadSecurityServer.extraVolumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+      initContainers:
+        - name: init-{{ include "xroad-securityserver.fullname" . }}-secondary
+          image: curlimages/curl:7.84.0
+          command: ['sh', '-c', "until curl -k -s --connect-timeout 5 https://{{ include "xroad-securityserver.fullname" . }}-primary:4000; do echo waiting for {{ include "xroad-securityserver.fullname" . }}-primary service; sleep 5; done"]
       {{- with $.Values.xroadSecurityServer.extraVolumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

@@ -49,18 +49,18 @@ spec:
               containerPort: 5577
             - name: health
               containerPort: 5588
-              protocol: TCP
-            - name: http
-              containerPort: 80
-              protocol: TCP
           livenessProbe:
             httpGet:
+              scheme: HTTPS
               path: /
-              port: health
+              port: proxy-ui-api
+            initialDelaySeconds: 90
           readinessProbe:
             httpGet:
+              scheme: HTTPS
               path: /
-              port: health
+              port: proxy-ui-api
+            initialDelaySeconds: 90
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with $.Values.xroadSecurityServer.extraVolumeMounts }}
