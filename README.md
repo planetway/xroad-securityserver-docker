@@ -217,8 +217,7 @@ You should have docker desktop available/running and context switched to it.
 Run `vagrant up` to apply manifests, use `kubectl` to check deployment/pod/service status.
 
 ## Helm chart
-[Helm](https://helm.sh) must be installed to use the chart.  Please refer to
-Helm's [documentation](https://helm.sh/docs) to get started.
+[Helm](https://helm.sh) must be installed to use the chart.  Please refer to Helm's [documentation](https://helm.sh/docs) to get started.
 
 Once Helm has been set up correctly, add the repo as follows:
 
@@ -226,14 +225,12 @@ Once Helm has been set up correctly, add the repo as follows:
 helm repo add xroad-securityserver https://planetway.github.io/xroad-securityserver-docker
 ```
 
-If you had already added this repo earlier, run `helm repo update` to retrieve
-the latest versions of the packages.  You can then run `helm search repo
-<alias>` to see the charts.
+If you had already added this repo earlier, run `helm repo update` to retrieve the latest versions of the packages.  You can then run `helm search repo xroad-securityserver` to see the charts.
 
-To install the <chart-name> chart:
+To install the `xroad-securityserver` chart:
 
 ```
-helm install xroad-securityserver <alias>/xroad-securityserver
+helm install xroad-securityserver xroad-securityserver/xroad-securityserver
 ```
 
 To uninstall the chart:
