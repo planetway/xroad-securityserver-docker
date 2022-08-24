@@ -20,7 +20,7 @@ kubectl apply -f xroad-securityserver-pvc.yaml
 
 ```
 helm repo add xroad-securityserver https://planetway.github.io/xroad-securityserver-docker
-helm install --values values.yaml xroad-securityserver/xroad-securityserver
+helm install --values values.yaml xroad-securityserver xroad-securityserver/xroad-securityserver
 ```
 
 ### Cleanup
