@@ -1,8 +1,8 @@
-# helm
+# Helm examples
 
-It is possible to deploy security server with helm.
+## Local development
 
-## Database
+### Database
 
 ```
 helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -10,19 +10,20 @@ helm install postgresql \
   --set auth.postgresPassword=secret bitnami/postgresql
 ```
 
-## Persistent volume
+### Persistent volume
 
 ```
 kubectl apply -f xroad-securityserver-pvc.yaml
 ```
 
-## Deploy security server
+### Security server
 
 ```
-helm install --values values.yaml xroad-securityserver ../../charts/xroad-securityserver
+helm repo add xroad-securityserver https://planetway.github.io/xroad-securityserver-docker
+helm install --values values.yaml xroad-securityserver/xroad-securityserver
 ```
 
-## Cleanup
+### Cleanup
 
 ```
 helm uninstall xroad-securityserver
