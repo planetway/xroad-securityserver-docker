@@ -46,13 +46,6 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
-
 nodeSelector: {}
 
 tolerations: []
@@ -60,6 +53,11 @@ tolerations: []
 affinity: {}
 
 xroadSecurityServer:
+  enroll: false
+  env: []
+  extraVolumeMounts: []
+  extraVolumes: []
+  secondaryReplicaCount: 1
   service:
     internal:
       annotations: {}
@@ -69,12 +67,4 @@ xroadSecurityServer:
       type: ClusterIP
     public:
       annotations: {}
-      type: ClusterIP
-  primary:
-    env: []
-  secondary:
-    enabled: false
-    env: []
-    replicaCount: 1
-  extraVolumeMounts: []
-  extraVolumes: []
+      type: LoadBalancer

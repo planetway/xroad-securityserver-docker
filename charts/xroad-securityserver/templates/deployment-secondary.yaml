@@ -1,4 +1,3 @@
-{{ if $.Values.xroadSecurityServer.secondary.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,9 +5,7 @@ metadata:
   labels:
     {{- include "xroad-securityserver-secondary.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
+  replicas: {{ .Values.xroadSecurityServer.secondaryReplicaCount }}
   selector:
     matchLabels:
       {{- include "xroad-securityserver-secondary.selectorLabels" . | nindent 6 }}
@@ -37,7 +34,9 @@ spec:
           env:
             - name: PX_NODE_TYPE
               value: 'secondary'
-          {{- with $.Values.xroadSecurityServer.secondary.env }}
+            - name: PX_ENROLL
+              value: 'false'
+          {{- with $.Values.xroadSecurityServer.env }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
           ports:
@@ -56,22 +55,27 @@ spec:
             httpGet:
               path: /
               port: health
-            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /
               port: health
-            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /
+              port: health
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 90
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with $.Values.xroadSecurityServer.extraVolumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      initContainers:
-        - name: init-{{ include "xroad-securityserver.fullname" . }}-secondary
-          image: curlimages/curl:7.84.0
-          command: ['sh', '-c', "until curl -k -s --connect-timeout 5 https://{{ include "xroad-securityserver.fullname" . }}-primary:4000; do echo waiting for {{ include "xroad-securityserver.fullname" . }}-primary service; sleep 5; done"]
       {{- with $.Values.xroadSecurityServer.extraVolumes }}
       volumes:
         {{- toYaml . | nindent 8 }}
@@ -88,4 +92,3 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-{{ end }}

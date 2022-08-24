@@ -15,9 +15,5 @@ spec:
       targetPort: proxy-ui-api
       protocol: TCP
       name: proxy-ui-api
-    - port: 5588
-      targetPort: health
-      protocol: TCP
-      name: health
   selector:
     {{- include "xroad-securityserver-primary.selectorLabels" . | nindent 4 }}

@@ -31,36 +31,39 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- with $.Values.xroadSecurityServer.primary.env }}
+          {{- with $.Values.xroadSecurityServer.env }}
           env:
+            {{- if $.Values.xroadSecurityServer.enroll }}
+            - name: PX_ENROLL
+              value: 'true'
+            {{- end }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
           ports:
-            - name: http
-              containerPort: 80
-            - name: https
-              containerPort: 443
             - name: proxy-ui-api
               containerPort: 4000
-              protocol: TCP
-            - name: message-exch
-              containerPort: 5500
-            - name: ocsp
-              containerPort: 5577
-            - name: health
-              containerPort: 5588
           livenessProbe:
             httpGet:
-              scheme: HTTPS
               path: /
               port: proxy-ui-api
-            initialDelaySeconds: 90
+              scheme: HTTPS
+            periodSeconds: 10
+            timeoutSeconds: 5
           readinessProbe:
             httpGet:
-              scheme: HTTPS
               path: /
               port: proxy-ui-api
-            initialDelaySeconds: 90
+              scheme: HTTPS
+            periodSeconds: 10
+            timeoutSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /
+              port: proxy-ui-api
+              scheme: HTTPS
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 90
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with $.Values.xroadSecurityServer.extraVolumeMounts }}

@@ -16,16 +16,10 @@ helm install postgresql \
 kubectl apply -f xroad-securityserver-pvc.yaml
 ```
 
-## Deploy security server as single instance
+## Deploy security server
 
 ```
-helm install --values values-single.yaml xroad-securityserver ../../charts/xroad-securityserver
-```
-
-## Deploy security server as HA
-
-```
-helm install --values values-ha.yaml xroad-securityserver ../../charts/xroad-securityserver
+helm install --values values.yaml xroad-securityserver ../../charts/xroad-securityserver
 ```
 
 ## Cleanup

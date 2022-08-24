@@ -20,4 +20,4 @@ spec:
       protocol: TCP
       name: ocsp
   selector:
-    {{- include "xroad-securityserver-common-service.selectorLabels" . | nindent 4 }}
+    {{- include "xroad-securityserver-secondary.selectorLabels" . | nindent 4 }}
