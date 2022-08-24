@@ -3,6 +3,16 @@ entries:
   xroad-securityserver:
   - apiVersion: v2
     appVersion: 6.26.0-1.414bd08.1a6c8357
+    created: "2022-08-24T13:07:03.139253254Z"
+    description: A Helm chart to install X-Road Security Server for Kubernetes
+    digest: e9fe02cd8cbf97135f11a94ff4e0a17d54d98489c9e7ea775e6cf1d6768dad1b
+    name: xroad-securityserver
+    type: application
+    urls:
+    - https://github.com/planetway/xroad-securityserver-docker/releases/download/xroad-securityserver-0.1.1/xroad-securityserver-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 6.26.0-1.414bd08.1a6c8357
     created: "2022-08-24T12:54:22.161112185Z"
     description: A Helm chart to install X-Road Security Server for Kubernetes
     digest: ec4d6edc090dd3b20a1a9cac64c5835a0de4c02cca0059b29aa6e4bef4e81c7d
@@ -11,4 +21,4 @@ entries:
     urls:
     - https://github.com/planetway/xroad-securityserver-docker/releases/download/xroad-securityserver-0.1.0/xroad-securityserver-0.1.0.tgz
     version: 0.1.0
-generated: "2022-08-24T12:54:22.161117585Z"
+generated: "2022-08-24T13:07:03.13926475Z"
