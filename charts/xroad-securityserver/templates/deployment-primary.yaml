@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "xroad-securityserver.fullname" . }}-primary
+  labels:
+    {{- include "xroad-securityserver-primary.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "xroad-securityserver-primary.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "xroad-securityserver-primary.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "xroad-securityserver.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with $.Values.xroadSecurityServer.env }}
+          env:
+            {{- if $.Values.xroadSecurityServer.enroll }}
+            - name: PX_ENROLL
+              value: 'true'
+            {{- end }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: proxy-ui-api
+              containerPort: 4000
+          livenessProbe:
+            httpGet:
+              path: /
+              port: proxy-ui-api
+              scheme: HTTPS
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: proxy-ui-api
+              scheme: HTTPS
+            periodSeconds: 10
+            timeoutSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /
+              port: proxy-ui-api
+              scheme: HTTPS
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 90
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- with $.Values.xroadSecurityServer.extraVolumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with $.Values.xroadSecurityServer.extraVolumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
